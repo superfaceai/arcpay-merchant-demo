@@ -1,27 +1,27 @@
+import { db } from "@/app/lib/db";
 import { Cart } from "@/app/store/objects/cart";
 
-import { writeFile, readFile, mkdir } from "fs/promises";
-import path from "path";
-
-const cartFilePath = (cartId: string) =>
-  path.join(process.cwd(), "temp", "carts", `${cartId}.json`);
-
-const ensureDirectory = async (filePath: string) => {
-  const directory = path.dirname(filePath);
-  await mkdir(directory, { recursive: true });
-};
+const storageKey = (cartId: string) => `cart:${cartId}`;
 
 export const loadCart = async (cartId: string): Promise<Cart | null> => {
   try {
-    const fileContent = await readFile(cartFilePath(cartId), "utf-8");
-    return JSON.parse(fileContent);
+    const cart = await db.get<Cart>(storageKey(cartId));
+    return cart || null;
   } catch (error) {
+    console.error(`Failed to load cart ${cartId}:`, error);
     return null;
   }
 };
 
 export const saveCart = async (cart: Cart): Promise<void> => {
-  const filePath = cartFilePath(cart.id);
-  await ensureDirectory(filePath);
-  await writeFile(filePath, JSON.stringify(cart, null, 2));
+  try {
+    await db
+      .multi()
+      .set(storageKey(cart.id), JSON.stringify(cart))
+      .expire(storageKey(cart.id), 60 * 60 * 24) // 24 hours in seconds
+      .exec();
+  } catch (error) {
+    console.error(`Failed to save cart ${cart.id}:`, error);
+    throw error;
+  }
 };

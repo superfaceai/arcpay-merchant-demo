@@ -24,7 +24,18 @@ Use the [included Postman collection](./docs/) to try out the store API:
 
 ## Development
 
-First, run the development server:
+Install the dependencies
+
+```bash
+npm i
+```
+
+Set the environment variables
+```bash
+cp .env.example .env
+```
+
+Run the development server:
 
 ```bash
 npm run dev
