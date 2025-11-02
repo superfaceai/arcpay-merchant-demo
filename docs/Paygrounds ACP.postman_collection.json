@@ -1,0 +1,275 @@
+{
+	"info": {
+		"_postman_id": "1ca33df1-7c6f-47ef-a72e-f64e7a8b5b45",
+		"name": "Paygrounds ACP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11364430"
+	},
+	"item": [
+		{
+			"name": "List Products",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{SERVER}}/api/products",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"products"
+					],
+					"query": [
+						{
+							"key": "find_id",
+							"value": "coffee-beans-500g",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[ACP] Create checkout session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json()",
+							"",
+							"if ('id' in response) {",
+							"    pm.collectionVariables.set('CHECKOUT_SESSION_ID', response.id)",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"items\": [\n       {\n           \"id\": \"coffee-beans-1\",\n           \"quantity\": 100\n       }\n   ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}/api/acp/checkout_sessions",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"acp",
+						"checkout_sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[ACP] Get checkout session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json()",
+							"",
+							"if ('id' in response) {",
+							"    pm.collectionVariables.set('CHECKOUT_SESSION_ID', response.id)",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{SERVER}}/api/acp/checkout_sessions/{{CHECKOUT_SESSION_ID}}",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"acp",
+						"checkout_sessions",
+						"{{CHECKOUT_SESSION_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[ACP] Update checkout session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json()",
+							"",
+							"if ('id' in response) {",
+							"    pm.collectionVariables.set('CHECKOUT_SESSION_ID', response.id)",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"items\": [\n       {\n           \"id\": \"coffee-beans-500g\",\n           \"quantity\": 2\n       }\n    ],\n    \"fulfillment_option_id\": \"ful_ElsqLNhSVEwlCWcC5SI43\",\n    \"fulfillment_address\": {\n        \"name\": \"Superface Inc.\",\n        \"line_one\": \"1111B Governors Ave\",\n        \"line_two\": \"Apt 101\",\n        \"city\": \"San Francisco\",\n        \"state\": \"CA\",\n        \"country\": \"US\",\n        \"postal_code\": \"94131\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}/api/acp/checkout_sessions/{{CHECKOUT_SESSION_ID}}",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"acp",
+						"checkout_sessions",
+						"{{CHECKOUT_SESSION_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[ACP] Complete checkout session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"buyer\": {\n       \"first_name\": \"Joe\",\n       \"last_name\": \"Anton\",\n       \"email\": \"joe.anton@superface.ai\",\n       \"phone_number\": \"15552003434\"\n   },\n   \"payment_data\": {\n       \"token\": \"apst_du9ZzTpBdb3sLxcwpskpObHLoXrhOiUmaVjTgeQ5rB\",\n       \"provider\": \"agentpay\",\n       \"billing_address\": {\n           \"name\": \"Superface Inc.\",\n           \"line_one\": \"1111B Governors Ave\",\n           \"line_two\": \"Apt 101\",\n           \"city\": \"San Francisco\",\n           \"state\": \"CA\",\n           \"country\": \"US\",\n           \"postal_code\": \"94131\"\n       }\n   }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}/api/acp/checkout_sessions/{{CHECKOUT_SESSION_ID}}/complete",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"acp",
+						"checkout_sessions",
+						"{{CHECKOUT_SESSION_ID}}",
+						"complete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[ACP] Cancel checkout session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{SERVER}}/api/acp/checkout_sessions/{{CHECKOUT_SESSION_ID}}/cancel",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"acp",
+						"checkout_sessions",
+						"{{CHECKOUT_SESSION_ID}}",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "SERVER",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "CHECKOUT_SESSION_ID",
+			"value": "",
+			"description": "Populates automatically after creating new session"
+		}
+	]
+}
