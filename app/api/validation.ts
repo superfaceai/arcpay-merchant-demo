@@ -24,7 +24,7 @@ export function withValidation<
   formatErrorResponse?: ValidationErrorResponseFactory
 ): (
   request: Request,
-  { params }: { params: z.infer<ParamsSchema> }
+  { params }: { params: Promise<z.infer<ParamsSchema>> }
 ) => Promise<Response>;
 export function withValidation<ParamsSchema extends z.ZodTypeAny>(
   validation: undefined,
@@ -38,7 +38,7 @@ export function withValidation<ParamsSchema extends z.ZodTypeAny>(
   formatErrorResponse?: ValidationErrorResponseFactory
 ): (
   request: Request,
-  { params }: { params: z.infer<ParamsSchema> }
+  { params }: { params: Promise<z.infer<ParamsSchema>> }
 ) => Promise<Response>;
 export function withValidation<
   BodySchema extends z.ZodTypeAny,
@@ -55,15 +55,16 @@ export function withValidation<
   formatErrorResponse = defaultFormatErrorResponse
 ): (
   request: Request,
-  { params }: { params: z.infer<ParamsSchema> }
+  { params }: { params: Promise<z.infer<ParamsSchema>> }
 ) => Promise<Response> {
   return async (
     request: Request,
-    { params }: { params: z.infer<ParamsSchema> }
+    { params }: { params: Promise<z.infer<ParamsSchema>> }
   ) => {
     const requestBody = await request.text();
+    const resolvedParams = await params;
 
-    if (!validation) return handler(request, { body: undefined, params });
+    if (!validation) return handler(request, { body: undefined, params: resolvedParams });
 
     const jsonBody = (function () {
       try {
@@ -88,7 +89,7 @@ export function withValidation<
       return formatErrorResponse(errors);
     }
 
-    return handler(request, { body: validated.data, params });
+    return handler(request, { body: validated.data, params: resolvedParams });
   };
 }
 

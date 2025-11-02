@@ -7,7 +7,7 @@ import { cancelCart } from "@/app/store/actions/cancel-cart";
 // Cancel Checkout Session
 export const POST = async (
   rawRequest: Request,
-  { params }: { params: { checkoutSessionId: string } }
+  { params }: { params: Promise<{ checkoutSessionId: string }> }
 ) => {
   const { checkoutSessionId } = await params;
 

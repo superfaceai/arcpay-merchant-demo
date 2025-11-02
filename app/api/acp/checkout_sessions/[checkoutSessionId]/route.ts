@@ -107,7 +107,7 @@ export const POST = withValidation(
 // Get Checkout Session
 export const GET = async (
   rawRequest: Request,
-  { params }: { params: { checkoutSessionId: string } }
+  { params }: { params: Promise<{ checkoutSessionId: string }> }
 ) => {
   const { checkoutSessionId } = await params;
 

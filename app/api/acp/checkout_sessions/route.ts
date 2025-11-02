@@ -19,7 +19,7 @@ import { getPaymentProvider } from "@/app/store/actions/get-payment-provider";
 
 // Create Checkout Session
 export const POST = withValidation(
-  { body: CreateCheckoutSessionRequest, params: z.undefined() },
+  { body: CreateCheckoutSessionRequest, params: z.object({}) },
   async (rawRequest, { body }) => {
     const result = await updateCart({
       items: body.items.map((item) => ({
