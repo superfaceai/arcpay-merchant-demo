@@ -251,11 +251,11 @@ export const mapACPPaymentDataToPayment = (
         : undefined,
     };
   }
-  if (paymentData.provider === "agentpay") {
+  if (paymentData.provider === "arc_pay") {
     // Not in ACP specification
     return {
       type: "delegated_payment",
-      provider: "agentpay",
+      provider: "arc_pay",
       token: paymentData.token,
       billingAddress: paymentData.billing_address
         ? mapACPAddressToAddress(paymentData.billing_address)

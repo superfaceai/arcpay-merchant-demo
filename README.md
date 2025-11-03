@@ -1,13 +1,13 @@
 # Paygrounds
 
-This is a playground e-commerce store that lets you try out agentic payments via Agent Pay in a sandbox environment.
+This is a playground e-commerce store that lets you try out agentic payments via Arc Pay in a sandbox environment.
 
 ## Agentic Commerce Protocol (ACP)
 
 | Protocol Part               | Supports       |
 | --------------------------- | -------------- |
 | Checkout Sessions           | ✅ All methods |
-| Delegated Payment providers | Agent Pay      |
+| Delegated Payment providers | Arc Pay      |
 | Delegated Payment method    | `wallet`       |
 
 ## Docs

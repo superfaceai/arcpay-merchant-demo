@@ -179,7 +179,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n   \"buyer\": {\n       \"first_name\": \"Joe\",\n       \"last_name\": \"Anton\",\n       \"email\": \"joe.anton@superface.ai\",\n       \"phone_number\": \"15552003434\"\n   },\n   \"payment_data\": {\n       \"token\": \"apst_du9ZzTpBdb3sLxcwpskpObHLoXrhOiUmaVjTgeQ5rB\",\n       \"provider\": \"agentpay\",\n       \"billing_address\": {\n           \"name\": \"Superface Inc.\",\n           \"line_one\": \"1111B Governors Ave\",\n           \"line_two\": \"Apt 101\",\n           \"city\": \"San Francisco\",\n           \"state\": \"CA\",\n           \"country\": \"US\",\n           \"postal_code\": \"94131\"\n       }\n   }\n}",
+					"raw": "{\n   \"buyer\": {\n       \"first_name\": \"Joe\",\n       \"last_name\": \"Anton\",\n       \"email\": \"joe.anton@superface.ai\",\n       \"phone_number\": \"15552003434\"\n   },\n   \"payment_data\": {\n       \"token\": \"apst_du9ZzTpBdb3sLxcwpskpObHLoXrhOiUmaVjTgeQ5rB\",\n       \"provider\": \"arc_pay\",\n       \"billing_address\": {\n           \"name\": \"Superface Inc.\",\n           \"line_one\": \"1111B Governors Ave\",\n           \"line_two\": \"Apt 101\",\n           \"city\": \"San Francisco\",\n           \"state\": \"CA\",\n           \"country\": \"US\",\n           \"postal_code\": \"94131\"\n       }\n   }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -264,12 +264,15 @@
 	"variable": [
 		{
 			"key": "SERVER",
-			"value": "http://localhost:3000"
+			"value": ""
 		},
 		{
 			"key": "CHECKOUT_SESSION_ID",
 			"value": "",
-			"description": "Populates automatically after creating new session"
+			"description": {
+				"content": "Populates automatically after creating new session",
+				"type": "text/plain"
+			}
 		}
 	]
 }

@@ -7,16 +7,17 @@ export default function Home() {
         </div>
         <p>
           This is a playground e-commerce store that lets you try out agentic
-          commerce protocols&nbsp;&&nbsp;payments via Agent Pay in a sandbox
+          commerce protocols&nbsp;&&nbsp;payments via Arc Pay in a sandbox
           environment.
         </p>
         <p>
           <a
-            href="#"
+            href="https://arcpay.ai"
             rel="noopener noreferrer"
+            target="_blank"
             className="underline underline-offset-4 hover:no-underline"
           >
-            Read more about Agent Pay
+            Read more about Arc Pay
           </a>
         </p>
 
