@@ -3,7 +3,7 @@ import { z } from "zod";
 // Enums
 export const PaymentProviderName = z.enum([
   "stripe",
-  "arc_pay", // Not in ACP specification
+  "arcpay", // Not in ACP specification
 ]);
 
 export const CheckoutStatus = z.enum([
