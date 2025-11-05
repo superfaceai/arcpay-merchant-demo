@@ -3,7 +3,7 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center bg-slate-100/70 font-sans dark:bg-black">
       <main className="min-h-screen w-full max-w-3xl px-3 py-6 flex flex-col gap-6">
         <div className="flex items-center gap-2 justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">•• Paygrounds</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Demo Store for Arc Pay</h1>
         </div>
         <p>
           This is a playground e-commerce store that lets you try out agentic
