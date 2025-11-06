@@ -14,6 +14,7 @@ import { getTax } from "@/app/store/actions/get-tax";
 import { makeACPValidationErrorResponse } from "@/app/acp/utils";
 import { withValidation } from "@/app/api/validation";
 import { completeCart } from "@/app/store/actions/complete-cart";
+import { getPaymentProvider } from "@/app/store/actions/get-payment-provider";
 
 // Complete Checkout Session
 export const POST = withValidation(
@@ -65,6 +66,7 @@ export const POST = withValidation(
       );
     }
 
+    const paymentProvider = await getPaymentProvider();
     const fulfillmentOptions = await getFulfillmentOptions(result.cart);
     const { taxRate } = await getTax(result.cart.fulfillmentAddress);
 
@@ -72,6 +74,7 @@ export const POST = withValidation(
       CompleteCheckoutSessionResponse.parse(
         mapCartToCheckoutSession({
           cart: result.cart,
+          paymentProvider,
           fulfillmentOptions,
           taxRate,
         })

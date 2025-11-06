@@ -3,6 +3,7 @@ import { mapCartToCheckoutSession } from "@/app/acp/mapping";
 import { getFulfillmentOptions } from "@/app/store/actions/get-fulfillment-options";
 import { getTax } from "@/app/store/actions/get-tax";
 import { cancelCart } from "@/app/store/actions/cancel-cart";
+import { getPaymentProvider } from "@/app/store/actions/get-payment-provider";
 
 // Cancel Checkout Session
 export const POST = async (
@@ -47,6 +48,7 @@ export const POST = async (
     );
   }
 
+  const paymentProvider = await getPaymentProvider();
   const fulfillmentOptions = await getFulfillmentOptions(result.cart);
   const { taxRate } = await getTax(result.cart.fulfillmentAddress);
 
@@ -54,6 +56,7 @@ export const POST = async (
     CancelCheckoutSessionResponse.parse(
       mapCartToCheckoutSession({
         cart: result.cart,
+        paymentProvider,
         fulfillmentOptions,
         taxRate,
       })
