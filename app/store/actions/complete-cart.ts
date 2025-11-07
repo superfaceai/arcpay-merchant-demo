@@ -5,7 +5,7 @@ import { generateId } from "@/app/lib/generate-id";
 
 import { loadCart, saveCart } from "../db/cart";
 import { saveOrder } from "../db/order";
-import { ArcPayClient } from "@/app/lib/arcpay";
+import { processPayment } from "./process-payment";
 
 export const completeCart = async ({
   cartId,
@@ -70,38 +70,14 @@ export const completeCart = async ({
   await saveOrder(order);
   await saveCart(completedCart);
 
-  // Capture the payment via ArcPay
-  if (payment.provider === "arcpay") {
-    try {
-      const arcpay = ArcPayClient.create();
-      const paymentCapture = await arcpay.capturePayment(
-        {
-          amount: order.totalPrice.toString(),
-          currency: ArcPayClient.fiatToStableCoin(order.currency),
-          granted_mandate_secret: payment.token,
-        },
-        { polling: true }
-      );
-
-      if (paymentCapture.status === "succeeded") {
-        order.financialStatus = "paid";
-      } else if (
-        paymentCapture.status === "requires_capture" ||
-        paymentCapture.status === "processing"
-      ) {
-        order.financialStatus = "pending";
-      } else if (
-        paymentCapture.status === "failed" ||
-        paymentCapture.status === "cancelled"
-      ) {
-        order.financialStatus = "pending";
-      }
-    } catch (error) {
-      console.error("Error capturing payment:", error);
-    }
-
-    await saveOrder(order);
+  const paymentResult = await processPayment({ orderId: order.id });
+  if (paymentResult.kind === "order_not_found") {
+    return { kind: "not_found" };
   }
+  if (paymentResult.kind === "payment_processed") {
+    order.financialStatus = "paid";
+  }
+  await saveOrder(order);
 
   return { kind: "completed", cart: completedCart, order: order };
 };
