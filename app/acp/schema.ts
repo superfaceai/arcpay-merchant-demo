@@ -268,7 +268,6 @@ export const WebhookEvent = z.object({
 export const CheckoutSession = z.object({
   id: z.string(),
   buyer: Buyer.optional(),
-  // payment_provider: PaymentProvider,
   status: CheckoutStatus,
   currency: Currency,
   line_items: z.array(LineItem),
@@ -276,6 +275,7 @@ export const CheckoutSession = z.object({
   fulfillment_options: z.array(FulfillmentOption),
   fulfillment_option_id: z.string().optional(),
   totals: z.array(Total),
+  payment_provider: PaymentProvider,
   messages: z.array(Message),
   links: z.array(Link),
 });
@@ -299,9 +299,7 @@ export const CreateCheckoutSessionRequest = z.object({
   fulfillment_address: Address.optional(),
 });
 
-export const CreateCheckoutSessionResponse = CheckoutSession.extend({
-  payment_provider: PaymentProvider,
-});
+export const CreateCheckoutSessionResponse = CheckoutSession;
 export type CreateCheckoutSessionResponse = z.infer<
   typeof CreateCheckoutSessionResponse
 >;

@@ -16,35 +16,21 @@ import { amount } from "../lib/amount";
 import { deliveryDate } from "../store/actions/delivery-date";
 import { Payment, PaymentProvider } from "../store/objects/payment";
 
-export const mapCartToCreateCheckoutSessionResponse = ({
+export const mapCartToCheckoutSession = ({
   cart,
-  paymentProvider,
   fulfillmentOptions,
+  paymentProvider,
   taxRate,
 }: {
   cart: Cart;
   paymentProvider: PaymentProvider;
   fulfillmentOptions: FulfillmentOption[];
   taxRate: number;
-}): CreateCheckoutSessionResponse => {
-  return {
-    payment_provider: mapPaymentProviderToACP(paymentProvider),
-    ...mapCartToCheckoutSession({ cart, fulfillmentOptions, taxRate }),
-  };
-};
-
-export const mapCartToCheckoutSession = ({
-  cart,
-  fulfillmentOptions,
-  taxRate,
-}: {
-  cart: Cart;
-  fulfillmentOptions: FulfillmentOption[];
-  taxRate: number;
 }): CheckoutSession => {
   return {
     id: cart.id,
     ...(cart.customer && { buyer: mapCustomerToACP(cart.customer) }),
+    payment_provider: mapPaymentProviderToACP(paymentProvider),
     status: STATUS_MAP[cart.status],
     currency: cart.currency,
     line_items: cart.items.map((item) => ({

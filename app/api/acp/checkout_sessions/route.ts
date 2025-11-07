@@ -9,7 +9,7 @@ import { makeACPValidationErrorResponse } from "@/app/acp/utils";
 import {
   mapACPAddressToAddress,
   mapACPBuyerToCustomer,
-  mapCartToCreateCheckoutSessionResponse,
+  mapCartToCheckoutSession,
 } from "@/app/acp/mapping";
 
 import { updateCart } from "@/app/store/actions/update-cart";
@@ -83,7 +83,7 @@ export const POST = withValidation(
 
     return Response.json(
       CreateCheckoutSessionResponse.parse(
-        mapCartToCreateCheckoutSessionResponse({
+        mapCartToCheckoutSession({
           cart: result.cart,
           paymentProvider,
           fulfillmentOptions,

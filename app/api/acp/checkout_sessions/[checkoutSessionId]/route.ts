@@ -17,6 +17,7 @@ import { makeACPValidationErrorResponse } from "@/app/acp/utils";
 import { updateCart } from "@/app/store/actions/update-cart";
 import { getFulfillmentOptions } from "@/app/store/actions/get-fulfillment-options";
 import { getTax } from "@/app/store/actions/get-tax";
+import { getPaymentProvider } from "@/app/store/actions/get-payment-provider";
 
 // Update Checkout Session
 export const POST = withValidation(
@@ -84,7 +85,7 @@ export const POST = withValidation(
         { status: 400 }
       );
     }
-
+    const paymentProvider = await getPaymentProvider();
     const fulfillmentOptions = await getFulfillmentOptions(result.cart);
     const { taxRate } = await getTax(result.cart.fulfillmentAddress);
 
@@ -92,6 +93,7 @@ export const POST = withValidation(
       UpdateCheckoutSessionResponse.parse(
         mapCartToCheckoutSession({
           cart: result.cart,
+          paymentProvider,
           fulfillmentOptions,
           taxRate,
         })
@@ -124,12 +126,18 @@ export const GET = async (
     );
   }
 
+  const paymentProvider = await getPaymentProvider();
   const fulfillmentOptions = await getFulfillmentOptions(cart);
   const { taxRate } = await getTax(cart.fulfillmentAddress);
 
   return Response.json(
     GetCheckoutSessionResponse.parse(
-      mapCartToCheckoutSession({ cart, fulfillmentOptions, taxRate })
+      mapCartToCheckoutSession({
+        cart,
+        paymentProvider,
+        fulfillmentOptions,
+        taxRate,
+      })
     ),
     {
       status: 200,
