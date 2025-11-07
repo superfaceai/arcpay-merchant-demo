@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Paygrounds • Curated coffee beans for your taste buds",
-  description: "Paygrounds is a playground e-commerce store that lets you try out agentic payments via Arc Pay in a sandbox environment.",
+  title: "Arc Pay Demo Store • Curated coffee beans for your taste buds",
+  description: "Playground e-commerce store that lets you try out agentic payments via Arc Pay in a sandbox environment.",
 };
 
 export default function RootLayout({

@@ -1,7 +1,7 @@
 import { Address } from "./address";
 
 export type PaymentMethod = "card" | "wallet";
-export type PaymentProviderName = "stripe" | "arc_pay";
+export type PaymentProviderName = "stripe" | "arcpay";
 
 type ProviderWithPaymentMethods<
   N extends PaymentProviderName,
@@ -13,7 +13,7 @@ type ProviderWithPaymentMethods<
 
 export type PaymentProvider =
   | ProviderWithPaymentMethods<"stripe", ["card"]>
-  | ProviderWithPaymentMethods<"arc_pay", ["wallet"]>;
+  | ProviderWithPaymentMethods<"arcpay", ["wallet"]>;
 
 type PaymentDelegated = {
   type: "delegated_payment";

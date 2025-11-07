@@ -1,4 +1,4 @@
-# Paygrounds
+# Arc Pay Merchant Demo Store
 
 This is a playground e-commerce store that lets you try out agentic payments via Arc Pay in a sandbox environment.
 
