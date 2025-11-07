@@ -6,7 +6,7 @@ type ProcessPaymentResult =
   | { kind: "order_not_found" }
   | { kind: "payment_processed" }
   | { kind: "payment_pending" }
-  | { kind: "payment_failed" }
+  | { kind: "payment_failed"; failure_reason: string | undefined }
   | { kind: "provider_not_supported" };
 
 export const processPayment = async ({
@@ -50,10 +50,16 @@ export const payWithArcPay = async (
     ) {
       return { kind: "payment_pending" };
     } else {
-      return { kind: "payment_failed" };
+      return {
+        kind: "payment_failed",
+        failure_reason: paymentCapture.failure_reason,
+      };
     }
   } catch (error) {
     console.error("Error capturing payment:", error);
-    return { kind: "payment_failed" };
+    return {
+      kind: "payment_failed",
+      failure_reason: error instanceof Error ? error.message : undefined,
+    };
   }
 };

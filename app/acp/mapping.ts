@@ -173,6 +173,16 @@ const mapCartMessagesToACP = (messages: CartMessage[]): ACPMessage[] =>
         content: `Product '${message.productId}' is not available in the requested quantity. Please adjust the quantity to ${message.maxQuantity} or less`,
       };
     }
+    if (message.kind === "payment_declined") {
+      return {
+        type: "error",
+        code: "payment_declined",
+        content_type: "plain",
+        content: `Payment was declined. ${
+          message.reason ? `Reason: ${message.reason}` : ""
+        }`,
+      };
+    }
 
     throw new Error(`Unknown message kind: ${message}`);
   });

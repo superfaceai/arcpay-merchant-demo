@@ -77,7 +77,15 @@ export const completeCart = async ({
   if (paymentResult.kind === "payment_processed") {
     order.financialStatus = "paid";
   }
+  if (paymentResult.kind === "payment_failed") {
+    cart.messages.push({
+      kind: "payment_declined",
+      reason: paymentResult.failure_reason,
+    });
+    order.financialStatus = "pending";
+  }
   await saveOrder(order);
+  await saveCart(cart);
 
   return { kind: "completed", cart: completedCart, order: order };
 };
