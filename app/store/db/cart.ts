@@ -32,3 +32,18 @@ export const saveCart = async (cart: Cart): Promise<void> => {
     throw error;
   }
 };
+
+export const listCarts = async (): Promise<Cart[]> => {
+  try {
+    const keys = await db.keys("cart:*");
+    if (keys.length === 0) {
+      return [];
+    }
+
+    const carts = await db.mget<Cart[]>(...keys);
+    return carts.filter((cart): cart is Cart => cart !== null);
+  } catch (error) {
+    console.error("Failed to list carts:", error);
+    return [];
+  }
+};

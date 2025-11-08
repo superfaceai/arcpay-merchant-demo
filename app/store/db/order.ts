@@ -25,3 +25,23 @@ export const saveOrder = async (order: Order): Promise<void> => {
     throw error;
   }
 };
+
+export const listOrders = async (): Promise<Order[]> => {
+  try {
+    const keys = await db.keys("order:*");
+    if (keys.length === 0) {
+      return [];
+    }
+
+    const orders = await db.mget<Order[]>(...keys);
+    return orders
+      .filter((order): order is Order => order !== null)
+      .sort(
+        (a, b) =>
+          new Date(b.processedAt).getTime() - new Date(a.processedAt).getTime()
+      );
+  } catch (error) {
+    console.error("Failed to list orders:", error);
+    return [];
+  }
+};
