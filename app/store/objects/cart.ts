@@ -24,6 +24,10 @@ export type CartMessage =
     }
   | {
       kind: "missing_fulfillment_address";
+    }
+  | {
+      kind: "payment_declined";
+      reason?: string;
     };
 
 export type Cart = {
