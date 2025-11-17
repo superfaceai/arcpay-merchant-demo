@@ -43,6 +43,7 @@ export const completeCart = async ({
     customer: customer ?? cart.customer,
     status: "completed",
     completedAt: new Date().toISOString(),
+    messages: cart.messages.filter((m) => m.kind !== "payment_declined"),
   };
 
   const order: Order = {
