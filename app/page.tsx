@@ -36,7 +36,7 @@ export default async function Home() {
                 target="_blank"
                 className="underline underline-offset-4 hover:no-underline text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
               >
-                Read more about Arc Pay
+                Try Arc Pay
               </a>
             </p>
           </div>
