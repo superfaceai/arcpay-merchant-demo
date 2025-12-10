@@ -25,7 +25,7 @@ const FULFILLMENT_OPTIONS: FulfillmentOption[] = [
     estimatedDeliveryMinDays: 3,
     estimatedDeliveryMaxDays: 14,
     currency: "USD",
-    basePrice: 9,
+    basePrice: 6,
   },
   {
     id: "ful_ElsqLNhSVEwlCWcC5SI43",
