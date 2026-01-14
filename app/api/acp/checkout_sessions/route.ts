@@ -30,6 +30,7 @@ export const POST = withValidation(
         ? mapACPAddressToAddress(body.fulfillment_address)
         : undefined,
       customer: body.buyer ? mapACPBuyerToCustomer(body.buyer) : undefined,
+      sourceProtocol: "acp",
     });
 
     if (

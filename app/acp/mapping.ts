@@ -183,6 +183,22 @@ const mapCartMessagesToACP = (messages: CartMessage[]): ACPMessage[] =>
         }`,
       };
     }
+    if (message.kind === "missing_buyer") {
+      return {
+        type: "error",
+        code: "invalid",
+        content_type: "plain",
+        content: "Please provide a buyer to continue with the checkout.",
+      };
+    }
+    if (message.kind === "missing_buyer_email") {
+      return {
+        type: "error",
+        code: "invalid",
+        content_type: "plain",
+        content: "Buyer email is required",
+      };
+    }
 
     throw new Error(`Unknown message kind: ${message}`);
   });

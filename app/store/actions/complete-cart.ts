@@ -66,6 +66,7 @@ export const completeCart = async ({
     shippingAddress: cart.fulfillmentAddress,
     fulfillmentChoiceId: cart.fulfillmentChoiceId,
     processedAt: new Date().toISOString(),
+    sourceProtocol: cart.sourceProtocol,
   };
 
   await saveOrder(order);

@@ -400,6 +400,12 @@ export function CartsOrdersTabs({ carts, orders }: CartsOrdersTabsProps) {
                                   {message.reason ? `: ${message.reason}` : ""}
                                 </span>
                               )}
+                              {message.kind === "missing_buyer" && (
+                                <span>Buyer information is required</span>
+                              )}
+                              {message.kind === "missing_buyer_email" && (
+                                <span>Buyer email is required</span>
+                              )}
                             </div>
                           ))}
                         </div>

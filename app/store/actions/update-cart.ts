@@ -1,5 +1,5 @@
 import { generateId } from "@/app/lib/generate-id";
-import { Cart, CartMessage, Customer } from "@/app/store/objects/cart";
+import { Cart, CartMessage, Customer, SourceProtocol } from "@/app/store/objects/cart";
 import { OrderLineItem } from "@/app/store/objects/order";
 import { Address } from "@/app/store/objects/address";
 
@@ -25,12 +25,14 @@ export const updateCart = async ({
   customer,
   fulfillmentAddress,
   fulfillmentChoiceId,
+  sourceProtocol,
 }: {
   cartId?: string;
   customer?: Customer;
   items?: Pick<OrderLineItem, "variantId" | "quantity">[];
   fulfillmentAddress?: Address;
   fulfillmentChoiceId?: FulfillmentOption["id"];
+  sourceProtocol: SourceProtocol;
 }): Promise<UpdateCartResult> => {
   const foundCart = cartId ? await loadCart(cartId) : undefined;
 
@@ -38,7 +40,7 @@ export const updateCart = async ({
     return { kind: "not_found" };
   }
 
-  const cart = foundCart ?? initCart();
+  const cart = foundCart ?? initCart(sourceProtocol);
 
   if (cart.status === "completed") {
     return { kind: "completed_cannot_update" };
@@ -157,6 +159,18 @@ export const updateCart = async ({
     });
   }
 
+  // Validate buyer information
+  const newCustomer = customer ?? cart.customer;
+  if (!newCustomer || Object.keys(newCustomer).length === 0) {
+    messages.push({
+      kind: "missing_buyer",
+    });
+  } else if (!newCustomer.email || newCustomer.email.trim() === "") {
+    messages.push({
+      kind: "missing_buyer_email",
+    });
+  }
+
   const shippingPrice = selectedFulfillmentOption?.basePrice ?? 0;
   const shippingTax = amount(shippingPrice * taxRate);
   totalTax = amount(totalTax + shippingTax);
@@ -190,7 +204,7 @@ export const updateCart = async ({
   return { kind: "updated", cart: newCart };
 };
 
-const initCart = (): Cart => {
+const initCart = (sourceProtocol: SourceProtocol): Cart => {
   return {
     id: generateId("cart"),
     items: [],
@@ -202,5 +216,6 @@ const initCart = (): Cart => {
     totalTax: 0,
     totalPrice: 0,
     messages: [],
+    sourceProtocol,
   };
 };

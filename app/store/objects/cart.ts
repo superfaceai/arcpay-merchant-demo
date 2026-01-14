@@ -28,7 +28,15 @@ export type CartMessage =
   | {
       kind: "payment_declined";
       reason?: string;
+    }
+  | {
+      kind: "missing_buyer";
+    }
+  | {
+      kind: "missing_buyer_email";
     };
+
+export type SourceProtocol = "acp" | "ucp";
 
 export type Cart = {
   id: string;
@@ -46,4 +54,5 @@ export type Cart = {
   totalTax: number;
   totalPrice: number;
   messages: CartMessage[];
+  sourceProtocol: SourceProtocol;
 };
