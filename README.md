@@ -7,8 +7,17 @@ This is a playground e-commerce store that lets you try out agentic payments via
 | Protocol Part               | Supports       |
 | --------------------------- | -------------- |
 | Checkout Sessions           | ✅ All methods |
-| Delegated Payment providers | Arc Pay      |
+| Delegated Payment providers | Arc Pay        |
 | Delegated Payment method    | `wallet`       |
+
+## Univercal Commerce Protocol (UCP)
+
+| Protocol Part         | Supports |
+| --------------------- | -------- |
+| Checkout Capability   | ✅       |
+| Fulfillment Extension | ✅       |
+| Payment handler       | Arc Pay  |
+| Payment instrument    | `wallet` |
 
 ## Docs
 
@@ -21,6 +30,13 @@ Use the [included Postman collection](./docs/) to try out the store API:
   - `GET /checkout_sessions/{checkout-session-id}`
   - `POST /checkout_sessions/{checkout-session-id}/complete`
   - `POST /checkout_sessions/{checkout-session-id}/cancel`
+- `/api/ucp/...` path prefix hosts the [Google's UCP](https://ucp.dev)
+  - `POST /checkout_sessions`
+  - `GET /checkout_sessions/{checkout-session-id}`
+  - `PUT /checkout_sessions/{checkout-session-id}`
+  - `POST /checkout_sessions/{checkout-session-id}/complete`
+  - `POST /checkout_sessions/{checkout-session-id}/cancel`
+  - \+ discovery manifest at root's `/.well-known/ucp`
 
 ## Development
 
@@ -31,6 +47,7 @@ npm i
 ```
 
 Set the environment variables
+
 ```bash
 cp .env.example .env
 ```
