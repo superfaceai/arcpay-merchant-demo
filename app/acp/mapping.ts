@@ -183,6 +183,22 @@ const mapCartMessagesToACP = (messages: CartMessage[]): ACPMessage[] =>
         }`,
       };
     }
+    if (message.kind === "missing_buyer") {
+      return {
+        type: "error",
+        code: "invalid",
+        content_type: "plain",
+        content: "Please provide a buyer to continue with the checkout.",
+      };
+    }
+    if (message.kind === "missing_buyer_email") {
+      return {
+        type: "error",
+        code: "invalid",
+        content_type: "plain",
+        content: "Buyer email is required",
+      };
+    }
 
     throw new Error(`Unknown message kind: ${message}`);
   });
@@ -241,6 +257,7 @@ export const mapACPPaymentDataToPayment = (
     return {
       type: "delegated_payment",
       provider: "stripe",
+      method: "card", // Stripe in ACP uses card payments
       token: paymentData.token,
       billingAddress: paymentData.billing_address
         ? mapACPAddressToAddress(paymentData.billing_address)
@@ -252,6 +269,7 @@ export const mapACPPaymentDataToPayment = (
     return {
       type: "delegated_payment",
       provider: "arcpay",
+      method: "wallet", // ArcPay uses wallet payments
       token: paymentData.token,
       billingAddress: paymentData.billing_address
         ? mapACPAddressToAddress(paymentData.billing_address)

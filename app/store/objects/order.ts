@@ -1,4 +1,4 @@
-import { Cart } from "./cart";
+import { Cart, SourceProtocol } from "./cart";
 import { Address } from "./address";
 import { Currency } from "./currency";
 import { ProductVariant } from "./product";
@@ -59,4 +59,5 @@ export type Order = {
   shippingAddress?: Address;
   processedAt: string;
   canceledAt?: string;
+  sourceProtocol: SourceProtocol;
 };

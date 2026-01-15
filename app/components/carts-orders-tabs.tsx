@@ -22,6 +22,7 @@ type Cart = {
   totalDiscount: number;
   totalShippingPrice: number;
   totalTax: number;
+  sourceProtocol: "acp" | "ucp";
 };
 
 type Order = {
@@ -36,6 +37,7 @@ type Order = {
   subtotalPrice: number;
   totalShippingPrice: number;
   totalTax: number;
+  sourceProtocol: "acp" | "ucp";
 };
 
 type CartsOrdersTabsProps = {
@@ -116,6 +118,15 @@ export function CartsOrdersTabs({ carts, orders }: CartsOrdersTabsProps) {
                   <div className="p-8 flex flex-col gap-6">
                     {/* Status Badges */}
                     <div className="flex flex-wrap gap-2">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          order.sourceProtocol === "ucp"
+                            ? "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400"
+                            : "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400"
+                        }`}
+                      >
+                        {order.sourceProtocol.toUpperCase()}
+                      </span>
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                           order.status === "fulfilled"
@@ -339,6 +350,15 @@ export function CartsOrdersTabs({ carts, orders }: CartsOrdersTabsProps) {
                     <div className="flex flex-wrap gap-2">
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          cart.sourceProtocol === "ucp"
+                            ? "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400"
+                            : "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400"
+                        }`}
+                      >
+                        {cart.sourceProtocol.toUpperCase()}
+                      </span>
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                           cart.status === "completed"
                             ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                             : cart.status === "cancelled"
@@ -399,6 +419,12 @@ export function CartsOrdersTabs({ carts, orders }: CartsOrdersTabsProps) {
                                   Payment declined
                                   {message.reason ? `: ${message.reason}` : ""}
                                 </span>
+                              )}
+                              {message.kind === "missing_buyer" && (
+                                <span>Buyer information is required</span>
+                              )}
+                              {message.kind === "missing_buyer_email" && (
+                                <span>Buyer email is required</span>
                               )}
                             </div>
                           ))}

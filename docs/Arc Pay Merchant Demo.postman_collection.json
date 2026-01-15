@@ -235,6 +235,368 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "[UCP] Discover server capabilities",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json()",
+							"",
+							"if ('id' in response) {",
+							"    pm.collectionVariables.set('CHECKOUT_SESSION_ID', response.id)",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{SERVER}}/.well-known/ucp",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						".well-known",
+						"ucp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[UCP] Create checkout session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json()",
+							"",
+							"if ('id' in response) {",
+							"    pm.collectionVariables.set('UCP_CHECKOUT_SESSION_ID', response.id)",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "UCP-Agent",
+						"value": "profile=\"{{UCP_AGENT_PROFILE_URL}}\"",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"line_items\": [\n    {\n      \"item\": {\n        \"id\": \"coffee-beans-1\"\n      },\n      \"quantity\": 100\n    }\n  ],\n  \"currency\": \"USD\",\n  \"buyer\": {},\n  \"payment\": {\n    \"instruments\": [\n      {\n        \"handler_id\": \"shop_pay\",\n        \"type\": \"shop_pay\",\n        \"email\": \"buyer@example.com\",\n        \"id\": \"instr_sp_1338ef2c-3913-4267-83a2-a84d07d9a6a6\"\n      }\n    ]\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}/api/ucp/checkout-sessions",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"ucp",
+						"checkout-sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[UCP] Get checkout session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json()",
+							"",
+							"if ('id' in response) {",
+							"    pm.collectionVariables.set('UCP_CHECKOUT_SESSION_ID', response.id)",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "UCP-Agent",
+						"value": "profile=\"{{UCP_AGENT_PROFILE_URL}}\"",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}/api/ucp/checkout-sessions/{{UCP_CHECKOUT_SESSION_ID}}",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"ucp",
+						"checkout-sessions",
+						"{{UCP_CHECKOUT_SESSION_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[UCP] Update checkout session (quantity + buyer)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "UCP-Agent",
+						"value": "profile=\"{{UCP_AGENT_PROFILE_URL}}\"",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": { \"id\": \"coffee-beans-500g\" },\n            \"quantity\": 2\n        }\n    ],\n    \"buyer\": {\n        \"first_name\": \"Joe\",\n        \"last_name\": \"Anton\",\n        \"email\": \"joe.anton@superface.ai\"\n    },\n    \"currency\": \"USD\",\n    \"payment\": {\n        \"instruments\": [\n            {\n                \"handler_id\": \"shop_pay\",\n                \"type\": \"shop_pay\",\n                \"email\": \"buyer@example.com\",\n                \"id\": \"instr_sp_1338ef2c-3913-4267-83a2-a84d07d9a6a6\"\n            }\n        ]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}/api/ucp/checkout-sessions/{{UCP_CHECKOUT_SESSION_ID}}",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"ucp",
+						"checkout-sessions",
+						"{{UCP_CHECKOUT_SESSION_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[UCP] Update checkout session (fulfilment)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "UCP-Agent",
+						"value": "profile=\"{{UCP_AGENT_PROFILE_URL}}\"",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": {\n                \"id\": \"coffee-beans-500g\"\n            },\n            \"quantity\": 2\n        }\n    ],\n    \"currency\": \"USD\",\n    \"fulfillment\": {\n        \"methods\": [\n            {\n                \"type\": \"shipping\",\n                \"destinations\": [\n                    {\n                        \"street_address\": \"1111B Governors Ave\",\n                        \"address_locality\": \"San Francisco\",\n                        \"address_region\": \"CA\",\n                        \"postal_code\": \"94131\",\n                        \"address_country\": \"US\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"payment\": {\n        \"instruments\": [\n            {\n                \"handler_id\": \"shop_pay\",\n                \"type\": \"shop_pay\",\n                \"email\": \"buyer@example.com\",\n                \"id\": \"instr_sp_1338ef2c-3913-4267-83a2-a84d07d9a6a6\"\n            }\n        ]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}/api/ucp/checkout-sessions/{{UCP_CHECKOUT_SESSION_ID}}",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"ucp",
+						"checkout-sessions",
+						"{{UCP_CHECKOUT_SESSION_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[UCP] Update checkout session (fulfilment option)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "UCP-Agent",
+						"value": "profile=\"{{UCP_AGENT_PROFILE_URL}}\"",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": {\n                \"id\": \"coffee-beans-500g\"\n            },\n            \"quantity\": 2\n        }\n    ],\n    \"currency\": \"USD\",\n    \"fulfillment\": {\n        \"methods\": [\n            {\n                \"id\": \"ful_method_0\",\n                \"type\": \"shipping\",\n                \"line_item_ids\": [\n                    \"coffee-beans-500g\"\n                ],\n                \"selected_destination_id\": \"ful_dest_0\",\n                \"groups\": [\n                    {\n                        \"id\": \"ful_package_0\",\n                        \"selected_option_id\": \"ful_ElsqLNhSVEwlCWcC5SI43\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"payment\": {\n        \"instruments\": [\n            {\n                \"handler_id\": \"shop_pay\",\n                \"type\": \"shop_pay\",\n                \"email\": \"buyer@example.com\",\n                \"id\": \"instr_sp_1338ef2c-3913-4267-83a2-a84d07d9a6a6\"\n            }\n        ]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}/api/ucp/checkout-sessions/{{UCP_CHECKOUT_SESSION_ID}}",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"ucp",
+						"checkout-sessions",
+						"{{UCP_CHECKOUT_SESSION_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[UCP] Complete checkout session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "UCP-Agent",
+						"value": "profile=\"{{UCP_AGENT_PROFILE_URL}}\"",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n  \"payment_data\": {\n    \n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}/api/ucp/checkout-sessions/{{UCP_CHECKOUT_SESSION_ID}}/complete",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"ucp",
+						"checkout-sessions",
+						"{{UCP_CHECKOUT_SESSION_ID}}",
+						"complete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[UCP] Cancel checkout session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "UCP-Agent",
+						"value": "profile=\"{{UCP_AGENT_PROFILE_URL}}\"",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}/api/ucp/checkout-sessions/{{UCP_CHECKOUT_SESSION_ID}}/cancel",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"ucp",
+						"checkout-sessions",
+						"{{UCP_CHECKOUT_SESSION_ID}}",
+						"cancel"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
@@ -268,6 +630,18 @@
 		},
 		{
 			"key": "CHECKOUT_SESSION_ID",
+			"value": "",
+			"description": {
+				"content": "Populates automatically after creating new session",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "UCP_AGENT_PROFILE_URL",
+			"value": ""
+		},
+		{
+			"key": "UCP_CHECKOUT_SESSION_ID",
 			"value": "",
 			"description": {
 				"content": "Populates automatically after creating new session",

@@ -18,8 +18,10 @@ export type PaymentProvider =
 type PaymentDelegated = {
   type: "delegated_payment";
   provider: PaymentProviderName;
+  method: PaymentMethod;
   token: string;
   billingAddress?: Address;
+  referenceNumber?: string;
 };
 
 export type Payment = PaymentDelegated;
