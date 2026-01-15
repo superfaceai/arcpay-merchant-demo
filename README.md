@@ -12,12 +12,12 @@ This is a playground e-commerce store that lets you try out agentic payments via
 
 ## Univercal Commerce Protocol (UCP)
 
-| Protocol Part         | Supports |
-| --------------------- | -------- |
-| Checkout Capability   | ✅       |
-| Fulfillment Extension | ✅       |
-| Payment handler       | Arc Pay  |
-| Payment instrument    | `wallet` |
+| Protocol Part         | Supports                                                       |
+| --------------------- | -------------------------------------------------------------- |
+| Checkout Capability   | ✅                                                             |
+| Fulfillment Extension | ✅                                                             |
+| Payment handler       | [Arc Pay](https://arcpay.ai/ucp/guides/arcpay-payment-handler) |
+| Payment instrument    | `wallet`                                                       |
 
 ## Docs
 
@@ -31,11 +31,11 @@ Use the [included Postman collection](./docs/) to try out the store API:
   - `POST /checkout_sessions/{checkout-session-id}/complete`
   - `POST /checkout_sessions/{checkout-session-id}/cancel`
 - `/api/ucp/...` path prefix hosts the [Google's UCP](https://ucp.dev)
-  - `POST /checkout_sessions`
-  - `GET /checkout_sessions/{checkout-session-id}`
-  - `PUT /checkout_sessions/{checkout-session-id}`
-  - `POST /checkout_sessions/{checkout-session-id}/complete`
-  - `POST /checkout_sessions/{checkout-session-id}/cancel`
+  - `POST /checkout-sessions`
+  - `GET /checkout-sessions/{checkout-session-id}`
+  - `PUT /checkout-sessions/{checkout-session-id}`
+  - `POST /checkout-sessions/{checkout-session-id}/complete`
+  - `POST /checkout-sessions/{checkout-session-id}/cancel`
   - \+ discovery manifest at root's `/.well-known/ucp`
 
 ## Development
