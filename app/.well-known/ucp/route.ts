@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { BusinessProfile, PaymentHandler } from "@/app/ucp/schema";
+import { BusinessProfile, PaymentHandlerResponse } from "@/app/ucp/schema";
 import { getSigningKeys } from "@/app/ucp/keys";
 
 export async function GET() {
@@ -9,12 +9,21 @@ export async function GET() {
 
   const signingKeys = getSigningKeys();
 
-  // Payment handler for Arc Pay
-  const paymentHandlers: PaymentHandler[] = [
+  // Payment handler for Arc Pay wallet
+  const paymentHandlers: PaymentHandlerResponse[] = [
     {
-      id: "ai.arcpay.wallet",
-      spec: "https://arcpay.ai/docs",
-      schema: "https://arcpay.ai/schemas/payment-handler.json",
+      id: "arcpay",
+      name: "ai.arcpay.wallet",
+      version: "2026-01-15",
+      spec: "https://arcpay.ai/ucp/guides/arcpay-payment-handler",
+      config_schema: "https://arcpay.ai/ucp/schemas/arcpay_config.json",
+      instrument_schemas: [
+        "https://arcpay.ai/ucp/schemas/arcpay_wallet_payment_instrument.json",
+      ],
+      config: {
+        environment: "sandbox",
+        merchant_id: process.env.ARCPAY_MERCHANT_ID ?? "",
+      },
     },
   ];
 
@@ -22,41 +31,41 @@ export async function GET() {
     ucp: {
       version: "2026-01-11",
       services: {
-        shopping: {
+        "dev.ucp.shopping": {
           version: "2026-01-11",
-          spec: "https://ucp.dev/specification/checkout/",
+          spec: "https://ucp.dev/specification/overview",
           rest: {
-            schema: "https://ucp.dev/schemas/shopping/checkout.json",
-            base_url: `${baseUrl}/api/ucp`,
+            schema: "https://ucp.dev/services/shopping/rest.openapi.json",
+            endpoint: `${baseUrl}/api/ucp`,
           },
         },
       },
       capabilities: [
         {
-          id: "dev.ucp.shopping.checkout",
-          spec: "https://ucp.dev/specification/checkout/",
-          schema: "https://ucp.dev/schemas/shopping/checkout.json",
+          name: "dev.ucp.shopping.checkout",
           version: "2026-01-11",
+          spec: "https://ucp.dev/specification/checkout",
+          schema: "https://ucp.dev/schemas/shopping/checkout.json",
         },
         {
-          id: "dev.ucp.shopping.fulfillment",
-          spec: "https://ucp.dev/specification/fulfillment/",
-          schema: "https://ucp.dev/schemas/shopping/checkout.json#fulfillment",
+          name: "dev.ucp.shopping.fulfillment",
           version: "2026-01-11",
+          spec: "https://ucp.dev/specification/fulfillment",
+          schema: "https://ucp.dev/schemas/shopping/fulfillment.json",
+          extends: "dev.ucp.shopping.checkout",
         },
       ],
     },
     payment: {
       handlers: paymentHandlers,
-      signing_keys: signingKeys,
     },
+    signing_keys: signingKeys,
   };
 
-  return Response.json(profile, {
+  return new Response(JSON.stringify(profile, null, 2), {
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "public, max-age=3600",
     },
   });
 }
-

@@ -3,38 +3,63 @@ import { z } from "zod";
 // UCP Business Profile Schema
 export const UCPVersion = z.literal("2026-01-11");
 
+// JWK Signing Key (EC P-256)
 export const SigningKey = z.object({
-  key_id: z.string(),
-  public_key: z.string(),
+  kid: z.string(),
+  kty: z.literal("EC"),
+  crv: z.literal("P-256"),
+  x: z.string(),
+  y: z.string(),
+  use: z.literal("sig"),
+  alg: z.literal("ES256"),
 });
 export type SigningKey = z.infer<typeof SigningKey>;
 
-export const PaymentHandler = z.object({
-  id: z.string(),
-  spec: z.string().url(),
-  schema: z.string().url(),
-});
-export type PaymentHandler = z.infer<typeof PaymentHandler>;
 
+// REST Transport binding
 export const RESTTransport = z.object({
   schema: z.string().url(),
-  base_url: z.string().url(),
+  endpoint: z.string().url(),
 });
 export type RESTTransport = z.infer<typeof RESTTransport>;
 
+// MCP Transport binding
+export const MCPTransport = z.object({
+  schema: z.string().url(),
+  endpoint: z.string().url(),
+});
+export type MCPTransport = z.infer<typeof MCPTransport>;
+
+// A2A Transport binding
+export const A2ATransport = z.object({
+  endpoint: z.string().url(),
+});
+export type A2ATransport = z.infer<typeof A2ATransport>;
+
+// Embedded Transport binding
+export const EmbeddedTransport = z.object({
+  schema: z.string().url(),
+});
+export type EmbeddedTransport = z.infer<typeof EmbeddedTransport>;
+
+// Service definition
 export const Service = z.object({
   version: z.string(),
   spec: z.string().url(),
   rest: RESTTransport.optional(),
+  mcp: MCPTransport.optional(),
+  a2a: A2ATransport.optional(),
+  embedded: EmbeddedTransport.optional(),
 });
 export type Service = z.infer<typeof Service>;
 
-// Capability (for discovery)
+// Capability (for discovery in Business Profile)
 export const Capability = z.object({
-  id: z.string(),
+  name: z.string(), // Reverse-domain notation
+  version: z.string(), // YYYY-MM-DD format
   spec: z.string().url(),
   schema: z.string().url(),
-  version: z.string().optional(),
+  extends: z.string().optional(), // Parent capability this extends
 });
 export type Capability = z.infer<typeof Capability>;
 
@@ -50,18 +75,6 @@ export const CapabilityResponse = z.object({
 });
 export type CapabilityResponse = z.infer<typeof CapabilityResponse>;
 
-export const BusinessProfile = z.object({
-  ucp: z.object({
-    version: UCPVersion,
-    services: z.record(z.string(), Service),
-    capabilities: z.array(Capability),
-  }),
-  payment: z.object({
-    handlers: z.array(PaymentHandler),
-    signing_keys: z.array(SigningKey),
-  }),
-});
-export type BusinessProfile = z.infer<typeof BusinessProfile>;
 
 // UCP Checkout Schema
 // Based on UCP Checkout Capability specification
@@ -642,3 +655,17 @@ export const ErrorResponse = z.object({
   messages: z.array(Message),
 });
 export type ErrorResponse = z.infer<typeof ErrorResponse>;
+
+// Business Profile
+export const BusinessProfile = z.object({
+  ucp: z.object({
+    version: UCPVersion,
+    services: z.record(z.string(), Service),
+    capabilities: z.array(Capability),
+  }),
+  payment: z.object({
+    handlers: z.array(PaymentHandlerResponse),
+  }),
+  signing_keys: z.array(SigningKey).optional(),
+});
+export type BusinessProfile = z.infer<typeof BusinessProfile>;

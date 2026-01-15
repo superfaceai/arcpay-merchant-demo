@@ -1,61 +1,77 @@
 import crypto from "crypto";
 import { SigningKey } from "./schema";
 
-// Generate a key pair for signing (RSA)
+// Generate an EC P-256 key pair for signing
 // In production, these should be stored securely and rotated regularly
-let cachedKeyPair: { publicKey: string; privateKey: string } | null = null;
+let cachedKeyPair: {
+  publicKey: crypto.KeyObject;
+  privateKey: crypto.KeyObject;
+  jwk: SigningKey;
+} | null = null;
 
 export const generateSigningKeyPair = (): {
-  publicKey: string;
-  privateKey: string;
+  publicKey: crypto.KeyObject;
+  privateKey: crypto.KeyObject;
+  jwk: SigningKey;
 } => {
   if (cachedKeyPair) {
     return cachedKeyPair;
   }
 
-  const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
-    modulusLength: 2048,
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem",
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem",
-    },
+  const { publicKey, privateKey } = crypto.generateKeyPairSync("ec", {
+    namedCurve: "P-256",
   });
 
-  cachedKeyPair = { publicKey, privateKey };
+  // Export public key as JWK
+  const jwkPublic = publicKey.export({ format: "jwk" });
+
+  const jwk: SigningKey = {
+    kid: "business_2025",
+    kty: "EC",
+    crv: "P-256",
+    x: jwkPublic.x as string,
+    y: jwkPublic.y as string,
+    use: "sig",
+    alg: "ES256",
+  };
+
+  cachedKeyPair = { publicKey, privateKey, jwk };
   return cachedKeyPair;
 };
 
 export const getSigningKeys = (): SigningKey[] => {
-  const { publicKey } = generateSigningKeyPair();
-  return [
-    {
-      key_id: "ucp-signing-key-1",
-      public_key: publicKey,
-    },
-  ];
+  const { jwk } = generateSigningKeyPair();
+  return [jwk];
 };
 
-// Sign data with the private key
+// Sign data with the private key (ES256)
 export const signData = (data: string): string => {
   const { privateKey } = generateSigningKeyPair();
-  const sign = crypto.createSign("RSA-SHA256");
+  const sign = crypto.createSign("SHA256");
   sign.update(data);
   sign.end();
   return sign.sign(privateKey, "base64");
 };
 
-// Verify signature with the public key
+// Verify signature with the public key (ES256)
 export const verifySignature = (
   data: string,
   signature: string,
-  publicKey: string
+  publicKeyJwk: SigningKey
 ): boolean => {
   try {
-    const verify = crypto.createVerify("RSA-SHA256");
+    // Import public key from JWK
+    const publicKey = crypto.createPublicKey({
+      key: {
+        kty: publicKeyJwk.kty,
+        crv: publicKeyJwk.crv,
+        x: publicKeyJwk.x,
+        y: publicKeyJwk.y,
+      },
+      format: "jwk",
+    });
+
+    const verify = crypto.createVerify("SHA256");
     verify.update(data);
     verify.end();
     return verify.verify(publicKey, signature, "base64");
@@ -63,4 +79,3 @@ export const verifySignature = (
     return false;
   }
 };
-
