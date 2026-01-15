@@ -10,7 +10,7 @@ This is a playground e-commerce store that lets you try out agentic payments via
 | Delegated Payment providers | Arc Pay        |
 | Delegated Payment method    | `wallet`       |
 
-## Univercal Commerce Protocol (UCP)
+## Universal Commerce Protocol (UCP)
 
 | Protocol Part         | Supports                                                       |
 | --------------------- | -------------------------------------------------------------- |
