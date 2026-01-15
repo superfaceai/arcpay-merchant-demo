@@ -10,6 +10,7 @@ import { validateUCPAgentHeader } from "@/app/ucp/agent-header";
 import {
   mapUCPBuyerToCustomer,
   mapCartToUCPCheckoutSession,
+  mapUCPPaymentRequestToPayment,
 } from "@/app/ucp/mapping";
 import { updateCart } from "@/app/store/actions/update-cart";
 import { getFulfillmentOptions } from "@/app/store/actions/get-fulfillment-options";
@@ -25,6 +26,9 @@ export const POST = withValidation(
     if (agentValidation instanceof Response) {
       return agentValidation;
     }
+    // Extract payment from request if instrument with credential is provided
+    const payment = mapUCPPaymentRequestToPayment(body.payment);
+
     // Map line_items to items format expected by updateCart
     const result = await updateCart({
       items: body.line_items.map((lineItem) => ({
@@ -35,6 +39,7 @@ export const POST = withValidation(
       // Note: fulfillment_address is not part of Create Checkout Request per spec
       // It will be added during update if needed
       sourceProtocol: "ucp",
+      payment,
     });
 
     if (

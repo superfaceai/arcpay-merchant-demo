@@ -27,8 +27,14 @@ import {
   OrderConfirmation,
   PostalAddress,
   PaymentInstrument,
+  PaymentInstrumentBase,
+  PaymentCreateRequest,
+  PaymentUpdateRequest,
+  CardPaymentInstrument,
+  ArcPayWalletPaymentInstrument,
 } from "./schema";
 import { Customer } from "@/app/store/objects/cart";
+import { mapPaymentProviderToUCPHandlers, resolveUCPHandlerIdToStore, getUCPHandler } from "./payment-handler-mapping";
 
 export const mapStoreAddressToUCPAddress = (
   address: StoreAddress | undefined
@@ -75,6 +81,22 @@ export const mapUCPPostalAddressToStoreAddress = (
     country: address.address_country || "",
     zip: address.postal_code || "",
     phone: address.phone_number,
+  };
+};
+
+export const mapStoreAddressToUCPPostalAddress = (
+  address: StoreAddress | undefined
+): PostalAddress | undefined => {
+  if (!address) return undefined;
+  return {
+    full_name: address.name,
+    street_address: address.address1,
+    extended_address: address.address2,
+    address_locality: address.city,
+    address_region: address.state,
+    address_country: address.country,
+    postal_code: address.zip,
+    phone_number: address.phone,
   };
 };
 
@@ -414,28 +436,49 @@ export const mapCartToUCPCheckoutSession = ({
     : [];
 
   // Map payment provider to PaymentResponse
-  const payment: PaymentResponse = paymentProvider
-    ? {
-        handlers: [
-          {
-            id: paymentProvider.provider,
-            name: `ai.${paymentProvider.provider}.${paymentProvider.supportedMethods[0]}`,
-            version: "2026-01-11",
-            spec: `https://${paymentProvider.provider}.ai/docs`,
-            config_schema: `https://${paymentProvider.provider}.ai/schemas/config.json`,
-            instrument_schemas: [
-              `https://${paymentProvider.provider}.ai/schemas/instrument.json`,
-            ],
-            config: {
-              provider: paymentProvider.provider,
-              supported_methods: paymentProvider.supportedMethods,
-            },
-          },
-        ],
-      }
-    : {
-        handlers: [],
-      };
+  // Only include instruments if payment exists AND has a referenceNumber (never leak token)
+  const paymentInstruments: PaymentInstrument[] = (() => {
+    if (!cart.payment || !cart.payment.referenceNumber) {
+      return [];
+    }
+
+    const baseInstrument = {
+      id: cart.payment.referenceNumber,
+      handler_id: getUCPHandler(cart.payment.provider)?.id ?? cart.payment.provider,
+      billing_address: cart.payment.billingAddress
+        ? mapStoreAddressToUCPPostalAddress(cart.payment.billingAddress)
+        : undefined,
+    };
+
+    // Return appropriate instrument type based on payment method
+    if (cart.payment.method === "wallet") {
+      // ArcPay Wallet Payment Instrument
+      return [
+        {
+          ...baseInstrument,
+          type: "wallet" as const,
+        } as ArcPayWalletPaymentInstrument,
+      ];
+    } else {
+      // Card Payment Instrument (default)
+      return [
+        {
+          ...baseInstrument,
+          type: "card" as const,
+          brand: "unknown", // We don't store this, use placeholder
+          last_digits: "****", // We don't store this, use placeholder
+        } as CardPaymentInstrument,
+      ];
+    }
+  })();
+
+  const payment: PaymentResponse = {
+    handlers: paymentProvider
+      ? mapPaymentProviderToUCPHandlers(paymentProvider)
+      : [],
+    instruments: paymentInstruments.length > 0 ? paymentInstruments : undefined,
+    selected_instrument_id: cart.payment?.referenceNumber,
+  };
 
   // Calculate expires_at (6 hours from now if not set)
   const expiresAt = cart.completedAt
@@ -479,26 +522,23 @@ export const mapUCPPaymentDataToPayment = (
 ): Payment => {
   const instrument: PaymentInstrument = paymentData;
 
-  // Extract provider from handler_id (e.g., "ai.stripe.payment-handler" -> "stripe")
-  // or "ai.arcpay.payment-handler" -> "arcpay"
-  let provider: PaymentProviderName;
-  if (instrument.handler_id.includes("stripe")) {
-    provider = "stripe";
-  } else if (instrument.handler_id.includes("arcpay")) {
-    provider = "arcpay";
-  } else {
+  // Resolve handler_id to store provider and method using the mapping
+  const storePaymentInfo = resolveUCPHandlerIdToStore(instrument.handler_id);
+  
+  if (!storePaymentInfo) {
     throw new Error(`Unknown payment handler: ${instrument.handler_id}`);
   }
 
-  // Extract token from credential
-  // For TokenCredentialResponse, the type field contains the token type identifier
-  // For CardCredential, we might need to use a different approach
+  const { provider, method } = storePaymentInfo;
+
+  // Extract token from credential based on credential type
   let token: string;
   if (instrument.credential) {
-    if (instrument.credential.type === "card") {
-      // For card credentials, we might use the instrument id or a combination
-      // In a real implementation, the token might be stored elsewhere or generated
-      // For now, we'll use the instrument id as a fallback
+    if (instrument.credential.type === "arcpay_mandate") {
+      // ArcPay mandate credential has token directly
+      token = (instrument.credential as { type: "arcpay_mandate"; token: string }).token;
+    } else if (instrument.credential.type === "card") {
+      // For card credentials, use the instrument id as reference
       token = instrument.id;
     } else {
       // TokenCredentialResponse - use the type field as token identifier
@@ -512,11 +552,92 @@ export const mapUCPPaymentDataToPayment = (
   const payment: Payment = {
     type: "delegated_payment",
     provider,
+    method,
     token,
     billingAddress: instrument.billing_address
       ? mapUCPPostalAddressToStoreAddress(instrument.billing_address)
       : undefined,
+    referenceNumber: instrument.id, // Use UCP instrument id as reference number
   };
 
   return payment;
+};
+
+/**
+ * Maps a UCP PaymentInstrumentBase to store Payment.
+ * Returns undefined if the instrument has no credential (not yet ready for payment).
+ */
+export const mapUCPInstrumentToPayment = (
+  instrument: PaymentInstrumentBase
+): Payment | undefined => {
+  // Only create payment if credential is provided
+  if (!instrument.credential) {
+    return undefined;
+  }
+
+  // Resolve handler_id to store provider and method using the mapping
+  const storePaymentInfo = resolveUCPHandlerIdToStore(instrument.handler_id);
+  
+  if (!storePaymentInfo) {
+    // Unknown handler, skip this instrument
+    return undefined;
+  }
+
+  const { provider, method } = storePaymentInfo;
+
+  // Extract token from credential based on credential type
+  let token: string;
+  if (instrument.credential.type === "arcpay_mandate") {
+    // ArcPay mandate credential has token directly
+    token = (instrument.credential as { type: "arcpay_mandate"; token: string }).token;
+  } else if (instrument.credential.type === "card") {
+    // For card credentials, use the instrument id as reference
+    token = instrument.id;
+  } else {
+    // TokenCredentialResponse - use the type field as token identifier
+    token = instrument.credential.type;
+  }
+
+  return {
+    type: "delegated_payment",
+    provider,
+    method,
+    token,
+    billingAddress: instrument.billing_address
+      ? mapUCPPostalAddressToStoreAddress(instrument.billing_address)
+      : undefined,
+    referenceNumber: instrument.id,
+  };
+};
+
+/**
+ * Extracts payment from UCP PaymentCreateRequest or PaymentUpdateRequest.
+ * Returns the selected instrument mapped to store Payment, or undefined if no valid payment.
+ */
+export const mapUCPPaymentRequestToPayment = (
+  paymentRequest: PaymentCreateRequest | PaymentUpdateRequest
+): Payment | undefined => {
+  if (!paymentRequest.instruments || paymentRequest.instruments.length === 0) {
+    return undefined;
+  }
+
+  // Find the selected instrument, or use the first one with a credential
+  let selectedInstrument: PaymentInstrumentBase | undefined;
+
+  if (paymentRequest.selected_instrument_id) {
+    selectedInstrument = paymentRequest.instruments.find(
+      (i) => i.id === paymentRequest.selected_instrument_id
+    );
+  }
+
+  // If no selected instrument or selected doesn't have credential, find first with credential
+  if (!selectedInstrument?.credential) {
+    selectedInstrument = paymentRequest.instruments.find((i) => i.credential);
+  }
+
+  if (!selectedInstrument) {
+    return undefined;
+  }
+
+  return mapUCPInstrumentToPayment(selectedInstrument);
 };

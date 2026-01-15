@@ -44,6 +44,7 @@ export const completeCart = async ({
     status: "completed",
     completedAt: new Date().toISOString(),
     messages: cart.messages.filter((m) => m.kind !== "payment_declined"),
+    payment, // Save payment on cart for response mapping
   };
 
   const order: Order = {
@@ -72,6 +73,10 @@ export const completeCart = async ({
   await saveOrder(order);
   await saveCart(completedCart);
 
+  const paidCart: Cart = {
+    ...completedCart,
+  };
+
   const paymentResult = await processPayment({ orderId: order.id });
   if (paymentResult.kind === "order_not_found") {
     return { kind: "not_found" };
@@ -80,14 +85,14 @@ export const completeCart = async ({
     order.financialStatus = "paid";
   }
   if (paymentResult.kind === "payment_failed") {
-    cart.messages.push({
+    paidCart.messages.push({
       kind: "payment_declined",
       reason: paymentResult.failure_reason,
     });
     order.financialStatus = "pending";
   }
   await saveOrder(order);
-  await saveCart(cart);
+  await saveCart(paidCart);
 
-  return { kind: "completed", cart: completedCart, order: order };
+  return { kind: "completed", cart: paidCart, order: order };
 };

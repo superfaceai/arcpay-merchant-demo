@@ -2,6 +2,7 @@ import { Currency } from "./currency";
 import { Address } from "./address";
 import { FulfillmentOption } from "./fulfillment-option";
 import { OrderLineItem } from "./order";
+import { Payment } from "./payment";
 
 export type Customer = {
   firstName: string;
@@ -55,4 +56,5 @@ export type Cart = {
   totalPrice: number;
   messages: CartMessage[];
   sourceProtocol: SourceProtocol;
+  payment?: Payment;
 };

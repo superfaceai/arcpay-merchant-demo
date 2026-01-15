@@ -2,6 +2,7 @@ import { generateId } from "@/app/lib/generate-id";
 import { Cart, CartMessage, Customer, SourceProtocol } from "@/app/store/objects/cart";
 import { OrderLineItem } from "@/app/store/objects/order";
 import { Address } from "@/app/store/objects/address";
+import { Payment } from "@/app/store/objects/payment";
 
 import { findProduct } from "./find-product";
 import { loadCart, saveCart } from "../db/cart";
@@ -26,6 +27,7 @@ export const updateCart = async ({
   fulfillmentAddress,
   fulfillmentChoiceId,
   sourceProtocol,
+  payment,
 }: {
   cartId?: string;
   customer?: Customer;
@@ -33,6 +35,7 @@ export const updateCart = async ({
   fulfillmentAddress?: Address;
   fulfillmentChoiceId?: FulfillmentOption["id"];
   sourceProtocol: SourceProtocol;
+  payment?: Payment;
 }): Promise<UpdateCartResult> => {
   const foundCart = cartId ? await loadCart(cartId) : undefined;
 
@@ -198,6 +201,7 @@ export const updateCart = async ({
     totalTax,
     totalPrice: amount(subtotalPrice + shippingPrice + totalTax),
     messages,
+    payment: payment ?? cart.payment,
   };
 
   await saveCart(newCart);

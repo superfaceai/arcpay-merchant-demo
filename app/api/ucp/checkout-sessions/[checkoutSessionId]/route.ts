@@ -12,6 +12,7 @@ import {
   mapUCPBuyerToCustomer,
   mapCartToUCPCheckoutSession,
   mapUCPPostalAddressToStoreAddress,
+  mapUCPPaymentRequestToPayment,
 } from "@/app/ucp/mapping";
 import { Address as StoreAddress } from "@/app/store/objects/address";
 import { loadCart } from "@/app/store/db/cart";
@@ -67,6 +68,9 @@ export const PUT = withValidation(
       }
     }
 
+    // Extract payment from request if instrument with credential is provided
+    const payment = mapUCPPaymentRequestToPayment(body.payment);
+
     const result = await updateCart({
       cartId: checkoutSessionId,
       items: body.line_items.map((lineItem) => ({
@@ -77,6 +81,7 @@ export const PUT = withValidation(
       fulfillmentAddress,
       fulfillmentChoiceId,
       sourceProtocol: "ucp",
+      payment,
     });
 
     if (

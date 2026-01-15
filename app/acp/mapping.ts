@@ -257,6 +257,7 @@ export const mapACPPaymentDataToPayment = (
     return {
       type: "delegated_payment",
       provider: "stripe",
+      method: "card", // Stripe in ACP uses card payments
       token: paymentData.token,
       billingAddress: paymentData.billing_address
         ? mapACPAddressToAddress(paymentData.billing_address)
@@ -268,6 +269,7 @@ export const mapACPPaymentDataToPayment = (
     return {
       type: "delegated_payment",
       provider: "arcpay",
+      method: "wallet", // ArcPay uses wallet payments
       token: paymentData.token,
       billingAddress: paymentData.billing_address
         ? mapACPAddressToAddress(paymentData.billing_address)

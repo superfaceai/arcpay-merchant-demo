@@ -252,6 +252,12 @@ export const TokenCredentialResponse = z.object({
 });
 export type TokenCredentialResponse = z.infer<typeof TokenCredentialResponse>;
 
+export const ArcPayMandateCredential = z.object({
+  type: z.literal("arcpay_mandate"),
+  token: z.string(),
+});
+export type ArcPayMandateCredential = z.infer<typeof ArcPayMandateCredential>;
+
 // Card Credential
 // Based on https://ucp.dev/specification/reference/#card-credential
 export const CardCredential = z.object({
@@ -269,10 +275,13 @@ export type CardCredential = z.infer<typeof CardCredential>;
 
 // Payment Credential
 // Based on https://ucp.dev/specification/reference/#payment-credential
-// This object MUST be one of the following types: Token Credential Response, Card Credential
+// This object MUST be one of the following types: Token Credential Response, Card Credential, ArcPay Mandate Credential
+// Note: More specific types (with literal `type` values) must come first in the union
+// because TokenCredentialResponse has type: z.string() which would match everything
 export const PaymentCredential = z.union([
-  TokenCredentialResponse,
-  CardCredential,
+  ArcPayMandateCredential, // type: "arcpay_mandate" (literal)
+  CardCredential,          // type: "card" (literal)
+  TokenCredentialResponse, // type: z.string() (catch-all, must be last)
 ]);
 export type PaymentCredential = z.infer<typeof PaymentCredential>;
 
@@ -344,10 +353,22 @@ export const CardPaymentInstrument = PaymentInstrumentBase.extend({
 });
 export type CardPaymentInstrument = z.infer<typeof CardPaymentInstrument>;
 
+export const ArcPayWalletPaymentInstrument = PaymentInstrumentBase.extend({
+  type: z.literal("wallet"),
+  credential: ArcPayMandateCredential.optional(),
+  rich_text_description: z.string().optional(),
+});
+export type ArcPayWalletPaymentInstrument = z.infer<
+  typeof ArcPayWalletPaymentInstrument
+>;
+
 // Payment Instrument (for Payment Response)
 // Based on https://ucp.dev/specification/reference/#payment-instrument
 // This object MUST be one of the following types: Card Payment Instrument
-export const PaymentInstrument = z.union([CardPaymentInstrument]);
+export const PaymentInstrument = z.union([
+  CardPaymentInstrument,
+  ArcPayWalletPaymentInstrument,
+]);
 export type PaymentInstrument = z.infer<typeof PaymentInstrument>;
 
 // Payment Response (for checkout response)
