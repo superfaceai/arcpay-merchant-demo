@@ -179,7 +179,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n   \"buyer\": {\n       \"first_name\": \"Joe\",\n       \"last_name\": \"Anton\",\n       \"email\": \"joe.anton@superface.ai\",\n       \"phone_number\": \"15552003434\"\n   },\n   \"payment_data\": {\n       \"token\": \"apst_du9ZzTpBdb3sLxcwpskpObHLoXrhOiUmaVjTgeQ5rB\",\n       \"provider\": \"arcpay\",\n       \"billing_address\": {\n           \"name\": \"Superface Inc.\",\n           \"line_one\": \"1111B Governors Ave\",\n           \"line_two\": \"Apt 101\",\n           \"city\": \"San Francisco\",\n           \"state\": \"CA\",\n           \"country\": \"US\",\n           \"postal_code\": \"94131\"\n       }\n   }\n}",
+					"raw": "{\n   \"buyer\": {\n       \"first_name\": \"Joe\",\n       \"last_name\": \"Anton\",\n       \"email\": \"joe.anton@superface.ai\",\n       \"phone_number\": \"15552003434\"\n   },\n   \"payment_data\": {\n       \"token\": \"apst_du9ZzTpBdb3sLxcwpskpObHLoXrhOiUmaVjTgeQ5rB\",\n       \"provider\": \"arc_pay\",\n       \"billing_address\": {\n           \"name\": \"Superface Inc.\",\n           \"line_one\": \"1111B Governors Ave\",\n           \"line_two\": \"Apt 101\",\n           \"city\": \"San Francisco\",\n           \"state\": \"CA\",\n           \"country\": \"US\",\n           \"postal_code\": \"94131\"\n       }\n   }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -301,7 +301,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"line_items\": [\n    {\n      \"item\": {\n        \"id\": \"coffee-beans-1\"\n      },\n      \"quantity\": 100\n    }\n  ],\n  \"currency\": \"USD\",\n  \"buyer\": {},\n  \"payment\": {\n    \"instruments\": [\n      {\n        \"handler_id\": \"shop_pay\",\n        \"type\": \"shop_pay\",\n        \"email\": \"buyer@example.com\",\n        \"id\": \"instr_sp_1338ef2c-3913-4267-83a2-a84d07d9a6a6\"\n      }\n    ]\n  }\n}",
+					"raw": "{\n  \"line_items\": [\n    {\n      \"item\": {\n        \"id\": \"coffee-beans-1\"\n      },\n      \"quantity\": 100\n    }\n  ],\n  \"currency\": \"USD\",\n  \"buyer\": {},\n  \"payment\": {}\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -391,7 +391,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": { \"id\": \"coffee-beans-500g\" },\n            \"quantity\": 2\n        }\n    ],\n    \"buyer\": {\n        \"first_name\": \"Joe\",\n        \"last_name\": \"Anton\",\n        \"email\": \"joe.anton@superface.ai\"\n    },\n    \"currency\": \"USD\",\n    \"payment\": {\n        \"instruments\": [\n            {\n                \"handler_id\": \"shop_pay\",\n                \"type\": \"shop_pay\",\n                \"email\": \"buyer@example.com\",\n                \"id\": \"instr_sp_1338ef2c-3913-4267-83a2-a84d07d9a6a6\"\n            }\n        ]\n    }\n}",
+					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": { \"id\": \"coffee-beans-500g\" },\n            \"quantity\": 2\n        }\n    ],\n    \"buyer\": {\n        \"first_name\": \"Joe\",\n        \"last_name\": \"Anton\",\n        \"email\": \"joe.anton@superface.ai\"\n    },\n    \"currency\": \"USD\",\n    \"payment\": {}\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -439,7 +439,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": {\n                \"id\": \"coffee-beans-500g\"\n            },\n            \"quantity\": 2\n        }\n    ],\n    \"currency\": \"USD\",\n    \"fulfillment\": {\n        \"methods\": [\n            {\n                \"type\": \"shipping\",\n                \"destinations\": [\n                    {\n                        \"street_address\": \"1111B Governors Ave\",\n                        \"address_locality\": \"San Francisco\",\n                        \"address_region\": \"CA\",\n                        \"postal_code\": \"94131\",\n                        \"address_country\": \"US\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"payment\": {\n        \"instruments\": [\n            {\n                \"handler_id\": \"shop_pay\",\n                \"type\": \"shop_pay\",\n                \"email\": \"buyer@example.com\",\n                \"id\": \"instr_sp_1338ef2c-3913-4267-83a2-a84d07d9a6a6\"\n            }\n        ]\n    }\n}",
+					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": {\n                \"id\": \"coffee-beans-500g\"\n            },\n            \"quantity\": 2\n        }\n    ],\n    \"currency\": \"USD\",\n    \"fulfillment\": {\n        \"methods\": [\n            {\n                \"type\": \"shipping\",\n                \"destinations\": [\n                    {\n                        \"full_name\": \"Superface Inc.\",\n                        \"street_address\": \"1111B Governors Ave\",\n                        \"address_locality\": \"San Francisco\",\n                        \"address_region\": \"CA\",\n                        \"postal_code\": \"94131\",\n                        \"address_country\": \"US\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"payment\": {}\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -487,7 +487,55 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": {\n                \"id\": \"coffee-beans-500g\"\n            },\n            \"quantity\": 2\n        }\n    ],\n    \"currency\": \"USD\",\n    \"fulfillment\": {\n        \"methods\": [\n            {\n                \"id\": \"ful_method_0\",\n                \"type\": \"shipping\",\n                \"line_item_ids\": [\n                    \"coffee-beans-500g\"\n                ],\n                \"selected_destination_id\": \"ful_dest_0\",\n                \"groups\": [\n                    {\n                        \"id\": \"ful_package_0\",\n                        \"selected_option_id\": \"ful_ElsqLNhSVEwlCWcC5SI43\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"payment\": {\n        \"instruments\": [\n            {\n                \"handler_id\": \"shop_pay\",\n                \"type\": \"shop_pay\",\n                \"email\": \"buyer@example.com\",\n                \"id\": \"instr_sp_1338ef2c-3913-4267-83a2-a84d07d9a6a6\"\n            }\n        ]\n    }\n}",
+					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": {\n                \"id\": \"coffee-beans-500g\"\n            },\n            \"quantity\": 2\n        }\n    ],\n    \"currency\": \"USD\",\n    \"fulfillment\": {\n        \"methods\": [\n            {\n                \"id\": \"ful_method_0\",\n                \"type\": \"shipping\",\n                \"line_item_ids\": [\n                    \"coffee-beans-500g\"\n                ],\n                \"selected_destination_id\": \"ful_dest_0\",\n                \"groups\": [\n                    {\n                        \"id\": \"ful_package_0\",\n                        \"selected_option_id\": \"ful_ElsqLNhSVEwlCWcC5SI43\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"payment\": {}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}/api/ucp/checkout-sessions/{{UCP_CHECKOUT_SESSION_ID}}",
+					"host": [
+						"{{SERVER}}"
+					],
+					"path": [
+						"api",
+						"ucp",
+						"checkout-sessions",
+						"{{UCP_CHECKOUT_SESSION_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[UCP] Update checkout session (add payment instrument)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "UCP-Agent",
+						"value": "profile=\"{{UCP_AGENT_PROFILE_URL}}\"",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"line_items\": [\n        {\n            \"item\": {\n                \"id\": \"coffee-beans-500g\"\n            },\n            \"quantity\": 2\n        }\n    ],\n    \"currency\": \"USD\",\n    \"payment\": {\n        \"selected_instrument_id\": \"payment_reference_12345\",\n        \"instruments\": [\n            {\n                \"id\": \"payment_reference_12345\",\n                \"handler_id\": \"arcpay\",\n                \"type\": \"wallet\",\n                \"credential\": {\n                    \"type\": \"arcpay_mandate\",\n                    \"token\": \"paym_RANDOM_TOKEN\",\n                    \"expires_at\": \"2032-01-01T22:10:00Z\"\n                },\n                \"billing_address\": {\n                    \"full_name\": \"Superface Inc.\",\n                    \"street_address\": \"1111B Governors Ave\",\n                    \"address_locality\": \"San Francisco\",\n                    \"address_region\": \"CA\",\n                    \"postal_code\": \"94131\",\n                    \"address_country\": \"US\"\n                }\n            }\n        ]\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -535,7 +583,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n  \"payment_data\": {\n    \n  }\n}",
+					"raw": "{\n    \"id\": \"{{UCP_CHECKOUT_SESSION_ID}}\",\n    \"payment_data\": {\n        \"id\": \"payment_reference_9876\",\n        \"handler_id\": \"arcpay\",\n        \"type\": \"wallet\",\n        \"credential\": {\n            \"type\": \"arcpay_mandate\",\n            \"token\": \"paym_REAL_MANDATE_SECRET\",\n            \"expires_at\": \"2026-01-16T22:10:00Z\"\n        },\n        \"billing_address\": {\n            \"full_name\": \"Superface Inc.\",\n            \"street_address\": \"1111B Governors Ave\",\n            \"address_locality\": \"San Francisco\",\n            \"address_region\": \"CA\",\n            \"postal_code\": \"94131\",\n            \"address_country\": \"US\"\n        }\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
