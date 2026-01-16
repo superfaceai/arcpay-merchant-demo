@@ -4,7 +4,6 @@ import { FulfillmentOption as StoreFulfillmentOption } from "@/app/store/objects
 import {
   PaymentProvider as StorePaymentProvider,
   Payment,
-  PaymentProviderName,
 } from "@/app/store/objects/payment";
 import { amount } from "@/app/lib/amount";
 import { deliveryDate } from "@/app/store/actions/delivery-date";
@@ -34,7 +33,11 @@ import {
   ArcPayWalletPaymentInstrument,
 } from "./schema";
 import { Customer } from "@/app/store/objects/cart";
-import { mapPaymentProviderToUCPHandlers, resolveUCPHandlerIdToStore, getUCPHandler } from "./payment-handler-mapping";
+import {
+  mapPaymentProviderToUCPHandlers,
+  resolveUCPHandlerIdToStore,
+  getUCPHandler,
+} from "./payment-handler-mapping";
 
 export const mapStoreAddressToUCPAddress = (
   address: StoreAddress | undefined
@@ -74,7 +77,10 @@ export const mapUCPPostalAddressToStoreAddress = (
   if (!address) return undefined;
   return {
     referenceName: address.id,
-    name: address.full_name || `${address.first_name || ""} ${address.last_name || ""}`.trim() || "",
+    name:
+      address.full_name ||
+      `${address.first_name || ""} ${address.last_name || ""}`.trim() ||
+      "",
     address1: address.street_address || "",
     address2: address.extended_address,
     city: address.address_locality || "",
@@ -212,7 +218,7 @@ export const mapCartMessageToUCPMessage = (
         path: "$.payment_data",
         content_type: "plain",
         content: message.reason || "Payment was declined",
-        severity: "requires_buyer_input", 
+        severity: "requires_buyer_input",
       };
     case "missing_buyer":
       return {
@@ -333,6 +339,17 @@ export const mapCartToUCPCheckoutSession = ({
     );
   });
 
+  // Any non-recoverable error means the session is not ready to complete.
+  // This includes missing buyer / buyer email, which can still exist even if the cart is in "checkout".
+  const hasBlockingUCPErrors = cart.messages.some(
+    (msg) =>
+      msg.kind === "missing_buyer" ||
+      msg.kind === "missing_buyer_email" ||
+      msg.kind === "missing_fulfillment_address" ||
+      msg.kind === "out_of_stock" ||
+      msg.kind === "quantity_not_available"
+  );
+
   // Map cart status to UCP checkout status
   // Check if there are errors that require escalation (non-recoverable errors)
   // const hasEscalationErrors = messages.some(
@@ -347,7 +364,7 @@ export const mapCartToUCPCheckoutSession = ({
       ? "canceled"
       : hasEscalationErrors
       ? "requires_escalation"
-      : cart.status === "checkout"
+      : cart.status === "checkout" && !hasBlockingUCPErrors
       ? "ready_for_complete"
       : "incomplete";
 
@@ -445,7 +462,8 @@ export const mapCartToUCPCheckoutSession = ({
 
     const baseInstrument = {
       id: cart.payment.referenceNumber,
-      handler_id: getUCPHandler(cart.payment.provider)?.id ?? cart.payment.provider,
+      handler_id:
+        getUCPHandler(cart.payment.provider)?.id ?? cart.payment.provider,
       billing_address: cart.payment.billingAddress
         ? mapStoreAddressToUCPPostalAddress(cart.payment.billingAddress)
         : undefined,
@@ -525,7 +543,7 @@ export const mapUCPPaymentDataToPayment = (
 
   // Resolve handler_id to store provider and method using the mapping
   const storePaymentInfo = resolveUCPHandlerIdToStore(instrument.handler_id);
-  
+
   if (!storePaymentInfo) {
     throw new Error(`Unknown payment handler: ${instrument.handler_id}`);
   }
@@ -537,7 +555,9 @@ export const mapUCPPaymentDataToPayment = (
   if (instrument.credential) {
     if (instrument.credential.type === "arcpay_mandate") {
       // ArcPay mandate credential has token directly
-      token = (instrument.credential as { type: "arcpay_mandate"; token: string }).token;
+      token = (
+        instrument.credential as { type: "arcpay_mandate"; token: string }
+      ).token;
     } else if (instrument.credential.type === "card") {
       // For card credentials, use the instrument id as reference
       token = instrument.id;
@@ -578,7 +598,7 @@ export const mapUCPInstrumentToPayment = (
 
   // Resolve handler_id to store provider and method using the mapping
   const storePaymentInfo = resolveUCPHandlerIdToStore(instrument.handler_id);
-  
+
   if (!storePaymentInfo) {
     // Unknown handler, skip this instrument
     return undefined;
@@ -590,7 +610,8 @@ export const mapUCPInstrumentToPayment = (
   let token: string;
   if (instrument.credential.type === "arcpay_mandate") {
     // ArcPay mandate credential has token directly
-    token = (instrument.credential as { type: "arcpay_mandate"; token: string }).token;
+    token = (instrument.credential as { type: "arcpay_mandate"; token: string })
+      .token;
   } else if (instrument.credential.type === "card") {
     // For card credentials, use the instrument id as reference
     token = instrument.id;
