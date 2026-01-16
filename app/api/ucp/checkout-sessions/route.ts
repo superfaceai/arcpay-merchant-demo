@@ -10,8 +10,10 @@ import { validateUCPAgentHeader } from "@/app/ucp/agent-header";
 import {
   mapUCPBuyerToCustomer,
   mapCartToUCPCheckoutSession,
+  mapUCPPostalAddressToStoreAddress,
   mapUCPPaymentRequestToPayment,
 } from "@/app/ucp/mapping";
+import { Address as StoreAddress } from "@/app/store/objects/address";
 import { updateCart } from "@/app/store/actions/update-cart";
 import { getFulfillmentOptions } from "@/app/store/actions/get-fulfillment-options";
 import { getTax } from "@/app/store/actions/get-tax";
@@ -26,6 +28,39 @@ export const POST = withValidation(
     if (agentValidation instanceof Response) {
       return agentValidation;
     }
+
+    // Handle fulfillment extension - extract address from destinations
+    let fulfillmentAddress: StoreAddress | undefined = undefined;
+    let fulfillmentChoiceId: string | undefined = undefined;
+
+    if (body.fulfillment?.methods && body.fulfillment.methods.length > 0) {
+      const method = body.fulfillment.methods[0];
+      
+      // Extract address from destinations array (first destination for shipping)
+      if (method.destinations && method.destinations.length > 0) {
+        const destination = method.destinations[0];
+        
+        // Check if it's a shipping destination (has PostalAddress fields)
+        if ('street_address' in destination) {
+          fulfillmentAddress = mapUCPPostalAddressToStoreAddress(destination);
+        }
+        // Or retail location with address field
+        else if ('address' in destination && destination.address) {
+          fulfillmentAddress = mapUCPPostalAddressToStoreAddress(destination.address);
+        }
+      }
+      
+      // Extract selected fulfillment option from groups
+      if (method.groups && method.groups.length > 0) {
+        for (const group of method.groups) {
+          if (group.selected_option_id) {
+            fulfillmentChoiceId = group.selected_option_id;
+            break;
+          }
+        }
+      }
+    }
+
     // Extract payment from request if instrument with credential is provided
     const payment = mapUCPPaymentRequestToPayment(body.payment);
 
@@ -36,8 +71,8 @@ export const POST = withValidation(
         quantity: lineItem.quantity,
       })),
       customer: body.buyer ? mapUCPBuyerToCustomer(body.buyer) : undefined,
-      // Note: fulfillment_address is not part of Create Checkout Request per spec
-      // It will be added during update if needed
+      fulfillmentAddress,
+      fulfillmentChoiceId,
       sourceProtocol: "ucp",
       payment,
     });

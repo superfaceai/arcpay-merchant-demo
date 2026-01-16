@@ -588,6 +588,7 @@ export const CreateCheckoutRequest = z.object({
   buyer: Buyer.optional(),
   currency: Currency,
   payment: PaymentCreateRequest,
+  fulfillment: FulfillmentRequest.optional(),
 });
 export type CreateCheckoutRequest = z.infer<typeof CreateCheckoutRequest>;
 
