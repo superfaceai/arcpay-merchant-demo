@@ -4,7 +4,7 @@ import { Payment } from "@/app/store/objects/payment";
 import { generateId } from "@/app/lib/generate-id";
 
 import { loadCart, saveCart } from "../db/cart";
-import { saveOrder } from "../db/order";
+import { deleteOrder, saveOrder } from "../db/order";
 import { processPayment } from "./process-payment";
 
 export const completeCart = async ({
@@ -73,7 +73,7 @@ export const completeCart = async ({
   await saveOrder(order);
   await saveCart(completedCart);
 
-  const paidCart: Cart = {
+  const cartAfterPayment: Cart = {
     ...completedCart,
   };
 
@@ -85,14 +85,20 @@ export const completeCart = async ({
     order.financialStatus = "paid";
   }
   if (paymentResult.kind === "payment_failed") {
-    paidCart.messages.push({
+    cartAfterPayment.messages.push({
       kind: "payment_declined",
       reason: paymentResult.failure_reason,
     });
+    cartAfterPayment.status = "checkout";
     order.financialStatus = "pending";
   }
-  await saveOrder(order);
-  await saveCart(paidCart);
 
-  return { kind: "completed", cart: paidCart, order: order };
+  if (paymentResult.kind === "payment_failed") {
+    await deleteOrder(order.id);
+  } else {
+    await saveOrder(order);
+  }
+  await saveCart(cartAfterPayment);
+
+  return { kind: "completed", cart: cartAfterPayment, order: order };
 };

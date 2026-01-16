@@ -26,6 +26,15 @@ export const saveOrder = async (order: Order): Promise<void> => {
   }
 };
 
+export const deleteOrder = async (orderId: string): Promise<void> => {
+  try {
+    await db.del(storageKey(orderId));
+  } catch (error) {
+    console.error(`Failed to delete order ${orderId}:`, error);
+    throw error;
+  }
+};
+
 export const listOrders = async (): Promise<Order[]> => {
   try {
     const keys = await db.keys("order:*");
