@@ -69,10 +69,11 @@ export const mapUCPAddressToStoreAddress = (
 };
 
 export const mapUCPPostalAddressToStoreAddress = (
-  address: PostalAddress | undefined
+  address: (PostalAddress & { id?: string }) | undefined
 ): StoreAddress | undefined => {
   if (!address) return undefined;
   return {
+    referenceName: address.id,
     name: address.full_name || `${address.first_name || ""} ${address.last_name || ""}`.trim() || "",
     address1: address.street_address || "",
     address2: address.extended_address,
@@ -367,7 +368,7 @@ export const mapCartToUCPCheckoutSession = ({
 
     // Map address to shipping destination
     const shippingDestination: ShippingDestinationResponse = {
-      id: "ful_dest_0", // Destination ID uses index within the list
+      id: cart.fulfillmentAddress.referenceName ?? "ful_dest_0", // Destination ID uses address referenceName if available, otherwise uses index within the list
       street_address: cart.fulfillmentAddress.address1,
       extended_address: cart.fulfillmentAddress.address2,
       address_locality: cart.fulfillmentAddress.city,
