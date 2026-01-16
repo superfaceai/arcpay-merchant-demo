@@ -1,4 +1,5 @@
 export type Address = {
+  referenceName?: string;
   name: string;
   company?: string;
   address1: string;
