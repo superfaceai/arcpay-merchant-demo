@@ -80,7 +80,7 @@ export default async function Home() {
               </div>
             </div>
 
-            <div className="text-slate-700 dark:text-slate-300 flex flex-col items-center sm:items-start sm:gap-2">
+            <div className="text-slate-700 dark:text-slate-300 flex flex-col items-start sm:gap-2">
               <a
                 href="https://arcpay.ai"
                 rel="noopener noreferrer"
