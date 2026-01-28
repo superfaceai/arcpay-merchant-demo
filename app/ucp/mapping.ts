@@ -6,6 +6,7 @@ import {
   Payment,
 } from "@/app/store/objects/payment";
 import { amount } from "@/app/lib/amount";
+import { getCheckoutDetailUrl, getOrderDetailUrl } from "@/app/lib/links";
 import { deliveryDate } from "@/app/store/actions/delivery-date";
 import {
   Address,
@@ -507,7 +508,7 @@ export const mapCartToUCPCheckoutSession = ({
   // Generate continue_url if status requires escalation
   const continueUrl =
     status === "requires_escalation" && baseUrl
-      ? new URL(`/checkout/${cart.id}`, baseUrl).toString()
+      ? getCheckoutDetailUrl(baseUrl, cart.id)
       : undefined;
 
   // Map order confirmation if order exists
@@ -515,7 +516,7 @@ export const mapCartToUCPCheckoutSession = ({
     orderId && baseUrl
       ? {
           id: orderId,
-          permalink_url: new URL(`/orders/${orderId}`, baseUrl).toString(),
+          permalink_url: getOrderDetailUrl(baseUrl, orderId),
         }
       : undefined;
 

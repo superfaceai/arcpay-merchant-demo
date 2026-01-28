@@ -1,4 +1,5 @@
 import z from "zod";
+import { headers } from "next/headers";
 import {
   CompleteCheckoutSessionRequest,
   CompleteCheckoutSessionResponse,
@@ -66,6 +67,10 @@ export const POST = withValidation(
       );
     }
 
+    const host = (await headers()).get("host");
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    const baseUrl = `${protocol}://${host}`;
+
     const paymentProvider = await getPaymentProvider();
     const fulfillmentOptions = await getFulfillmentOptions(result.cart);
     const { taxRate } = await getTax(result.cart.fulfillmentAddress);
@@ -77,6 +82,8 @@ export const POST = withValidation(
           paymentProvider,
           fulfillmentOptions,
           taxRate,
+          baseUrl,
+          orderId: result.order.id,
         })
       ),
       {

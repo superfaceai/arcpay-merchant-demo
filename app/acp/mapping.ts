@@ -13,6 +13,7 @@ import {
 import { Address } from "../store/objects/address";
 import { FulfillmentOption } from "../store/objects/fulfillment-option";
 import { amount } from "../lib/amount";
+import { getOrderDetailUrl } from "../lib/links";
 import { deliveryDate } from "../store/actions/delivery-date";
 import { Payment, PaymentProvider } from "../store/objects/payment";
 
@@ -21,12 +22,25 @@ export const mapCartToCheckoutSession = ({
   fulfillmentOptions,
   paymentProvider,
   taxRate,
+  baseUrl,
+  orderId,
 }: {
   cart: Cart;
   paymentProvider: PaymentProvider;
   fulfillmentOptions: FulfillmentOption[];
   taxRate: number;
+  baseUrl?: string;
+  orderId?: string;
 }): CheckoutSession => {
+  const order =
+    baseUrl && orderId
+      ? {
+          id: orderId,
+          checkout_session_id: cart.id,
+          permalink_url: getOrderDetailUrl(baseUrl, orderId),
+        }
+      : undefined;
+
   return {
     id: cart.id,
     ...(cart.customer && { buyer: mapCustomerToACP(cart.customer) }),
@@ -90,6 +104,7 @@ export const mapCartToCheckoutSession = ({
     ],
     messages: mapCartMessagesToACP(cart.messages),
     links: [],
+    ...(order && { order }),
   };
 };
 

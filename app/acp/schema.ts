@@ -278,6 +278,7 @@ export const CheckoutSession = z.object({
   payment_provider: PaymentProvider,
   messages: z.array(Message),
   links: z.array(Link),
+  order: Order.optional(),
 });
 export type CheckoutSession = z.infer<typeof CheckoutSession>;
 
