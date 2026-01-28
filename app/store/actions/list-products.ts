@@ -1,6 +1,7 @@
 import { Product } from "@/app/store/objects/product";
+import { loadProducts, saveProducts } from "@/app/store/db/product";
 
-export const listProducts = async (): Promise<Product[]> => [
+export const seedProducts: Product[] = [
   {
     id: "coffee-beans-1",
     title: "Premium Coffee Beans",
@@ -232,3 +233,14 @@ export const listProducts = async (): Promise<Product[]> => [
     totalInventory: 55,
   },
 ];
+
+export const listProducts = async (): Promise<Product[]> => {
+  const existing = await loadProducts();
+  if (existing && existing.length > 0) {
+    return existing;
+  }
+
+  await saveProducts(seedProducts);
+  return seedProducts;
+};
+

@@ -5,7 +5,47 @@ import { generateId } from "@/app/lib/generate-id";
 
 import { loadCart, saveCart } from "../db/cart";
 import { deleteOrder, saveOrder } from "../db/order";
+import { loadProducts, saveProducts } from "../db/product";
 import { processPayment } from "./process-payment";
+
+const updateProductsInventoryFromOrder = async (order: Order): Promise<void> => {
+  const products = (await loadProducts()) ?? [];
+
+  if (products.length === 0) {
+    return;
+  }
+
+  for (const lineItem of order.lineItems) {
+    const product = products.find((p) =>
+      p.variants.some((v) => v.id === lineItem.variantId)
+    );
+
+    if (!product) {
+      continue;
+    }
+
+    const variant = product.variants.find((v) => v.id === lineItem.variantId);
+
+    if (!variant) {
+      continue;
+    }
+
+    // Basic guard against negative inventory; clamp at 0.
+    const newVariantQty = Math.max(
+      0,
+      (variant.quantityAvailable ?? 0) - lineItem.quantity
+    );
+    const newTotalInventory = Math.max(
+      0,
+      (product.totalInventory ?? 0) - lineItem.quantity
+    );
+
+    variant.quantityAvailable = newVariantQty;
+    product.totalInventory = newTotalInventory;
+  }
+
+  await saveProducts(products);
+};
 
 export const completeCart = async ({
   cartId,
@@ -96,6 +136,8 @@ export const completeCart = async ({
   if (paymentResult.kind === "payment_failed") {
     await deleteOrder(order.id);
   } else {
+    // Payment succeeded, deduct inventory from products store.
+    await updateProductsInventoryFromOrder(order);
     await saveOrder(order);
   }
   await saveCart(cartAfterPayment);

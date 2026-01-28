@@ -772,6 +772,9 @@ export function CartsOrdersTabs({
                 </a>
                 .
               </p>
+              <p className="mt-1 text-[0.7rem] text-slate-500 dark:text-slate-400">
+                Available product quantities reset every day at 1am (UTC).
+              </p>
             </div>
           )}
         </div>
