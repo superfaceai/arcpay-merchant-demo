@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+
 import { OrderLineItem } from "../store/objects/order";
 import { CartMessage } from "../store/objects/cart";
+import { Product } from "../store/objects/product";
 
 type Cart = {
   id: string;
@@ -43,10 +46,19 @@ type Order = {
 type CartsOrdersTabsProps = {
   carts: Cart[];
   orders: Order[];
+  products: Product[];
 };
 
-export function CartsOrdersTabs({ carts, orders }: CartsOrdersTabsProps) {
-  const [activeTab, setActiveTab] = useState<"orders" | "carts">("orders");
+export function CartsOrdersTabs({
+  carts,
+  orders,
+  products,
+}: CartsOrdersTabsProps) {
+  const [activeTab, setActiveTab] = useState<"orders" | "carts" | "products">(
+    "orders",
+  );
+  const origin =
+    typeof window !== "undefined" ? window.location.origin ?? "" : "";
 
   return (
     <div className="grid grid-cols-1 gap-6">
@@ -71,6 +83,16 @@ export function CartsOrdersTabs({ carts, orders }: CartsOrdersTabsProps) {
           }`}
         >
           Carts ({carts.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("products")}
+          className={`px-4 py-2 font-medium text-sm transition-colors ${
+            activeTab === "products"
+              ? "text-slate-900 dark:text-slate-100 border-b-2 border-slate-900 dark:border-slate-100"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+          }`}
+        >
+          Products ({products.length})
         </button>
       </div>
 
@@ -572,6 +594,184 @@ export function CartsOrdersTabs({ carts, orders }: CartsOrdersTabsProps) {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === "products" && (
+        <div>
+          {products.length === 0 ? (
+            <p className="text-slate-600 dark:text-slate-400">
+              No products found.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              <div className="grid gap-6 md:grid-cols-2">
+                {products.map((product) => (
+                  <article
+                    key={product.id}
+                    className="flex flex-col gap-4 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+                  >
+                  <div className="flex gap-4">
+                    <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-neutral-100 dark:bg-slate-700">
+                      <Image
+                        src={product.featuredImage.url}
+                        alt={product.featuredImage.altText ?? product.title}
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                      />
+                    </div>
+
+                    <div className="flex flex-1 flex-col gap-1">
+                      <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        {product.title}
+                      </h2>
+                      <p className="text-[0.7rem] uppercase tracking-[0.16em] text-neutral-500 dark:text-slate-400">
+                        {product.brand} • {product.category}
+                      </p>
+                      <p className="line-clamp-3 text-xs text-neutral-700 dark:text-slate-200">
+                        {product.description}
+                      </p>
+
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[0.7rem] text-neutral-600 dark:text-slate-300">
+                        <span className="rounded-full bg-emerald-50 px-2 py-1 font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
+                          Condition: {product.condition}
+                        </span>
+                        <span className="rounded-full bg-sky-50 px-2 py-1 font-medium text-sky-700 dark:bg-sky-900/40 dark:text-sky-200">
+                          Fulfillment: {product.fulfillmentType}
+                        </span>
+                        <span className="rounded-full bg-neutral-100 px-2 py-1 font-mono text-neutral-700 dark:bg-slate-700 dark:text-slate-100">
+                          ID: {product.id}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 text-[0.7rem] text-neutral-800 dark:text-slate-100">
+                    <div className="space-y-1 rounded-lg bg-neutral-50 p-3 dark:bg-slate-900/40">
+                      <h3 className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-slate-400">
+                        Pricing
+                      </h3>
+                      <p>
+                        Range:{" "}
+                        <span className="font-semibold">
+                          {product.currency}{" "}
+                          {product.priceRange.minVariantPrice.toFixed(2)} –{" "}
+                          {product.currency}{" "}
+                          {product.priceRange.maxVariantPrice.toFixed(2)}
+                        </span>
+                      </p>
+                      <p className="text-neutral-600 dark:text-slate-300">
+                        Compare-at: {product.currency}{" "}
+                        {product.compareAtPriceRange.minVariantPrice.toFixed(2)}{" "}
+                        – {product.currency}{" "}
+                        {product.compareAtPriceRange.maxVariantPrice.toFixed(2)}
+                      </p>
+                      <p className="text-neutral-600 dark:text-slate-300">
+                        Total inventory:{" "}
+                        <span className="font-medium">
+                          {product.totalInventory}
+                        </span>
+                      </p>
+                    </div>
+
+                    <div className="space-y-1 rounded-lg bg-neutral-50 p-3 dark:bg-slate-900/40">
+                      <h3 className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-slate-400">
+                        Variants
+                      </h3>
+                      <p className="text-neutral-600 dark:text-slate-300">
+                        Default variant ID:{" "}
+                        <span className="font-mono">
+                          {product.defaultVariantId}
+                        </span>
+                      </p>
+                      <ul className="mt-1 space-y-1">
+                        {product.variants.map((variant) => (
+                          <li
+                            key={variant.id}
+                            className="rounded-md bg-white/70 px-2 py-1 shadow-xs dark:bg-slate-800/80"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-[0.7rem] font-medium">
+                                {variant.title} ({variant.sku})
+                              </span>
+                              <span className="text-[0.7rem] font-semibold">
+                                {product.currency} {variant.price.toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[0.65rem] text-neutral-600 dark:text-slate-300">
+                              <span>
+                                Weight: {variant.weight.amount}{" "}
+                                {variant.weight.unit}
+                              </span>
+                              <span>Qty: {variant.quantityAvailable}</span>
+                              <span>
+                                Status:{" "}
+                                {variant.availableForSale
+                                  ? "Available for sale"
+                                  : "Not available"}
+                              </span>
+                              {variant.currentlyNotInStock && (
+                                <span className="font-medium text-amber-700 dark:text-amber-300">
+                                  Currently not in stock
+                                </span>
+                              )}
+                              {variant.taxable && <span>Taxable</span>}
+                            </div>
+                            {variant.selectedOptions.length > 0 && (
+                              <div className="mt-0.5 text-[0.65rem] text-neutral-600 dark:text-slate-300">
+                                Options:{" "}
+                                {variant.selectedOptions
+                                  .map((o) => `${o.name}: ${o.value}`)
+                                  .join(", ")}
+                              </div>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 text-[0.65rem] text-neutral-600 dark:text-slate-300">
+                    <div>
+                      <span className="font-semibold">Tags:</span>{" "}
+                      {product.tags.length > 0 ? product.tags.join(", ") : "—"}
+                    </div>
+                    {product.options.length > 0 && (
+                      <div>
+                        <span className="font-semibold">Options:</span>{" "}
+                        {product.options
+                          .map(
+                            (opt) =>
+                              `${opt.name} [${opt.values.join(", ")}] (pos. ${
+                                opt.position
+                              })`,
+                          )
+                          .join(" • ")}
+                      </div>
+                    )}
+                    <div>
+                      <span className="font-semibold">Media count:</span>{" "}
+                      {product.media.length}
+                    </div>
+                  </div>
+                </article>
+              ))}
+              </div>
+              <p className="mt-3 pt-3 text-[0.7rem] text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                Products feed is also available as JSON at{" "}
+                <a
+                  href="/api/products"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.65rem] text-slate-800 underline underline-offset-2 dark:bg-slate-800 dark:text-slate-100"
+                >
+                  {origin ? `${origin}/api/products` : "/api/products"}
+                </a>
+                .
+              </p>
             </div>
           )}
         </div>

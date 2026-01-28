@@ -1,10 +1,12 @@
 import { listCartsAction } from "@/app/store/actions/list-carts";
 import { listOrdersAction } from "@/app/store/actions/list-orders";
+import { listProducts } from "@/app/store/actions/list-products";
 import { CartsOrdersTabs } from "@/app/components/carts-orders-tabs";
 
 export default async function Home() {
   const carts = await listCartsAction();
   const orders = await listOrdersAction();
+  const products = await listProducts();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100/70 font-sans dark:bg-black">
@@ -96,7 +98,7 @@ export default async function Home() {
           </div>
         </div>
 
-        <CartsOrdersTabs carts={carts} orders={orders} />
+        <CartsOrdersTabs carts={carts} orders={orders} products={products} />
       </main>
     </div>
   );
