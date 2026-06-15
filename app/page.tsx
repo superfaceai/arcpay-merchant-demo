@@ -3,6 +3,8 @@ import { listOrdersAction } from "@/app/store/actions/list-orders";
 import { listProducts } from "@/app/store/actions/list-products";
 import { CartsOrdersTabs } from "@/app/components/carts-orders-tabs";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const carts = await listCartsAction();
   const orders = await listOrdersAction();

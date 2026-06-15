@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { loadCart } from "@/app/store/db/cart";
 
+export const dynamic = "force-dynamic";
+
 interface CheckoutPageProps {
   params: Promise<{ cartId: string }>;
 }

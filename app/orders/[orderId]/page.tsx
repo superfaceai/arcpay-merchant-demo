@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { loadOrder } from "@/app/store/db/order";
 
+export const dynamic = "force-dynamic";
+
 interface OrderPageProps {
   params: Promise<{ orderId: string }>;
 }
